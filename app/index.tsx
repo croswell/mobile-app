@@ -6,7 +6,7 @@ import PostCard from "../src/components/PostCard";
 export default function Home() {
   const { posts } = useData();
   return (
-    <View style={tw`flex-1 bg-neutral-950 p-4`}>
+    <View style={tw`flex-1 bg-neutral-950 px-2`}>
       <FlatList
         data={posts}
         keyExtractor={(p) => p.id}
