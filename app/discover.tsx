@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { View, Text, TextInput, FlatList, Pressable } from "react-native";
+import { View, Text, TextInput, FlatList, Pressable, ScrollView } from "react-native";
 import tw from "../src/lib/tw";
 import { useData } from "../src/state/data";
 import { groupBy } from "../src/lib/group";
@@ -48,24 +48,27 @@ export default function Discover() {
       </View>
 
       {/* league chips */}
-      <FlatList
-        horizontal
-        data={["ALL", ...LEAGUES] as const}
-        keyExtractor={(k)=>String(k)}
-        contentContainerStyle={tw`px-4 pb-2`}
-        renderItem={({ item }) => {
-          const on = league === item;
-          return (
-            <Pressable
-              onPress={()=>setLeague(item as any)}
-              style={tw`${on ? "bg-neutral-100 border-neutral-100" : "bg-neutral-900 border-neutral-700"} border rounded-full px-3 py-1 mr-2`}
-            >
-              <Text style={tw`${on ? "text-neutral-950" : "text-neutral-300"} text-xs font-medium`}>{item}</Text>
-            </Pressable>
-          );
-        }}
-        showsHorizontalScrollIndicator={false}
-      />
+      <View style={tw`px-4 pb-2`}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={tw`flex-row gap-2`}>
+            {(["ALL", ...LEAGUES] as const).map((k) => {
+              const on = league === k;
+              return (
+                <Pressable
+                  key={k}
+                  onPress={() => setLeague(k as any)}
+                  style={tw`${on ? "bg-neutral-100 border-neutral-100" : "bg-neutral-900 border-neutral-700"} border rounded-full px-4 py-2`}
+                >
+                  <Text style={tw`${on ? "text-neutral-950" : "text-neutral-300"} text-sm`}>{k}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
 
       {/* results */}
       <FlatList
