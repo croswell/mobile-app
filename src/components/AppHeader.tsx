@@ -10,10 +10,10 @@ export default function AppHeader() {
 
   return (
     <View style={[tw`bg-neutral-950`, { paddingTop: top }]}>
-      <View style={tw`flex-row items-center px-8 pb-2`}>
+      <View style={tw`flex-row items-center px-4 pb-4`}>
         <Image
           source={require("../../assets/images/ios-app-icon.png")}
-          style={tw`w-8 h-8 rounded-lg`}
+          style={tw`w-10 h-10 rounded-lg`}
           accessible
           accessibilityLabel="DubClub"
         />
