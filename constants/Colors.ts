@@ -1,5 +1,5 @@
-const tintColorLight = '#22c55e'; // green-500
-const tintColorDark = '#22c55e'; // green-500
+const tintColorLight = '#00D639'; // green-500
+const tintColorDark = '#00D639'; // green-500
 
 export default {
   light: {

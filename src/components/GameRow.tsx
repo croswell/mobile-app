@@ -61,7 +61,7 @@ export default function GameRow({ game, startTime, league, bets }: Props) {
       </View>
 
       <Pressable style={tw`mt-3 bg-brand rounded-lg px-3 py-2`}>
-        <Text style={tw`text-neutral-950 text-center text-sm font-medium`}>Bet Now (mock)</Text>
+        <Text style={tw`text-neutral-950 text-center text-sm font-medium`}>Bet Now</Text>
       </Pressable>
     </View>
   );
