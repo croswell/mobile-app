@@ -2,18 +2,17 @@ import { View, Text, Pressable, FlatList } from "react-native";
 import tw from "../lib/tw";
 import BottomSheet from "./BottomSheet";
 import { useUI } from "../state/ui";
-import { Check, BookOpen, ChevronRight, RefreshCw } from "lucide-react-native";
+import { ChevronRight, RefreshCw } from "lucide-react-native";
+import Logo from "./Logo";
 
 export default function BookDrawer() {
   const { bookDrawerOpen, closeBookDrawer } = useUI();
 
-  // Sportsbook data - in a real app this would come from your data layer
+  // Sportsbook data - only showing synced accounts: DraftKings, FanDuel, PrizePicks
   const sportsbooks = [
-    { id: "1", name: "DraftKings", balance: 200, isActive: true },
-    { id: "2", name: "FanDuel", balance: 150, isActive: false },
-    { id: "3", name: "Underdog", balance: 75, isActive: false },
-    { id: "4", name: "PrizePicks", balance: 50, isActive: false },
-    { id: "5", name: "Sleeper", balance: 25, isActive: false },
+    { id: "1", name: "DraftKings", balance: 250, isActive: true },
+    { id: "2", name: "FanDuel", balance: 200, isActive: true },
+    { id: "3", name: "PrizePicks", balance: 50, isActive: true },
   ];
 
   const totalBalance = sportsbooks.reduce((sum, book) => sum + book.balance, 0);
@@ -26,7 +25,7 @@ export default function BookDrawer() {
       accessibilityLabel={`Select ${sportsbook.name} sportsbook`}
     >
       <View style={tw`flex-row items-center`}>
-        <BookOpen size={20} color="#9CA3AF" />
+        <Logo book={sportsbook.name} size="small" />
         <View style={tw`ml-3 flex-1`}>
           <Text style={tw`text-white text-base font-medium`}>{sportsbook.name}</Text>
         </View>
@@ -39,7 +38,7 @@ export default function BookDrawer() {
   );
 
   return (
-    <BottomSheet open={bookDrawerOpen} onClose={closeBookDrawer} initialHeight={400}>
+    <BottomSheet open={bookDrawerOpen} onClose={closeBookDrawer} initialHeight={300}>
       <Text style={tw`text-white text-xl font-bold mb-4`}>Select Sportsbook</Text>
       
       <FlatList
@@ -84,7 +83,7 @@ export default function BookDrawer() {
         accessibilityLabel="Add new account"
       >
         <View style={tw`flex-row items-center justify-center`}>
-          <BookOpen size={18} color="#22C55E" />
+          {/* Removed BookOpen size={18} color="#22C55E" */}
           <Text style={tw`text-green-500 text-base ml-2 font-medium`}>Add Account</Text>
         </View>
       </Pressable>

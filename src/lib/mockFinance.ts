@@ -4,14 +4,13 @@ import { useData } from "../state/data";
 const logos = {
   dk: "https://cdn.opticodds.com/sportsbook-logos/draftkings.jpg",
   fd: "https://cdn.opticodds.com/sportsbook-logos/fanduel.jpg",
-  ud: "https://dummyimage.com/80x80/0f172a/fff&text=UD",
-  px: "https://dummyimage.com/80x80/1e293b/fff&text=PX",
+  pp: "https://dummyimage.com/80x80/8B5CF6/fff&text=PP",
 };
 
 let accounts: LinkedAccount[] = [
-  { id: "dk", name: "DraftKings", logo: logos.dk, cashBalance: 200.00 },
-  { id: "fd", name: "FanDuel",    logo: logos.fd, cashBalance: 150.00 },
-  { id: "ud", name: "Underdog",   logo: logos.ud, cashBalance: 125.00 },
+  { id: "dk", name: "DraftKings", logo: logos.dk, cashBalance: 250.00 },
+  { id: "fd", name: "FanDuel",    logo: logos.fd, cashBalance: 200.00 },
+  { id: "pp", name: "PrizePicks", logo: logos.pp, cashBalance: 50.00 },
 ];
 
 const sleep = (ms=250) => new Promise(r => setTimeout(r, ms));

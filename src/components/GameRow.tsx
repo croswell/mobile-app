@@ -33,10 +33,7 @@ export default function GameRow({ game, startTime, league, bets }: Props) {
     const bookMap: Record<string, string> = {
       'dk': 'DraftKings',
       'fd': 'FanDuel',
-      'pp': 'PrizePicks',
-      'ud': 'Underdog',
-      'sl': 'Sleeper',
-      'mgm': 'BetMGM'
+      'pp': 'PrizePicks'
     };
     return bookMap[bookId] || bookId;
   };

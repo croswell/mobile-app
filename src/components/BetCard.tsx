@@ -18,10 +18,7 @@ export default function BetCard({ bet, onPress }: BetCardProps) {
     const bookMap: Record<string, string> = {
       'dk': 'DraftKings',
       'fd': 'FanDuel',
-      'pp': 'PrizePicks',
-      'ud': 'Underdog',
-      'sl': 'Sleeper',
-      'mgm': 'BetMGM'
+      'pp': 'PrizePicks'
     };
     return bookMap[bookId] || bookId;
   };

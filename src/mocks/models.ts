@@ -46,7 +46,7 @@ export const ParsedBet = z.object({
   market: z.string(),        // Moneyline, Spread, Player Prop, Parlay, etc.
   line: z.string(),          // e.g., "Over 24.5", "-2.5", "+120"
   odds: z.number(),          // actual odds, e.g., -110, +200
-  book: z.string(),          // DraftKings, FanDuel, PrizePicks, Underdog
+  book: z.string(),          // DraftKings, FanDuel, PrizePicks
   eventTime: z.string(),     // ISO string in the near future
   betType: z.enum(["moneyline", "spread", "total", "player_prop", "parlay"]).optional(), // New field for bet type
   liveProgress: LiveBetProgress.optional(), // New field for live bet progress

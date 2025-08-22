@@ -1,5 +1,5 @@
 export type LinkedAccount = {
-  id: string;                 // 'dk' | 'fd' | 'ud' | etc
+  id: string;                 // 'dk' | 'fd' | 'pp'
   name: string;               // DraftKings, FanDuel...
   logo: string;               // url or local require later
   cashBalance: number;        // available cash

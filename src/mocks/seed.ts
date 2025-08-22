@@ -4,10 +4,10 @@ import type { BookT, PartnerT, BetT, PostT, ParsedBetT } from "./models";
 /**
  * BETTING PLATFORM RESTRICTIONS:
  * 
- * Traditional Sportsbooks (DraftKings, FanDuel, BetMGM):
+ * Traditional Sportsbooks (DraftKings, FanDuel):
  * - Support all bet types: Moneyline, Spread, Total, Player Prop, Player Prop Parlay
  * 
- * Daily Fantasy Platforms (PrizePicks, Underdog, Sleeper):
+ * Daily Fantasy Platform (PrizePicks):
  * - ONLY support Player Prop Parlay bets
  * - NO Moneyline, Spread, or Total bets
  * - Must be player-specific over/under props (points, rebounds, assists, etc.)
@@ -27,9 +27,6 @@ export function makeSeed(): {
     { id: "dk",  name: "DraftKings" },
     { id: "fd",  name: "FanDuel" },
     { id: "pp",  name: "PrizePicks" },
-    { id: "ud",  name: "Underdog" },
-    { id: "sl",  name: "Sleeper" },
-    { id: "mgm", name: "BetMGM" },
   ];
 
   const partners: PartnerT[] = [
@@ -109,7 +106,7 @@ export function makeSeed(): {
         ]),
         line: faker.helpers.arrayElement(["+120", "-150", "+180", "-200", "+110", "-130"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, +110, +120, +150, +180]),
-        allowedBooks: ["DraftKings", "FanDuel", "BetMGM"],
+        allowedBooks: ["DraftKings", "FanDuel"],
         league: faker.helpers.arrayElement(["NBA", "NFL", "MLB", "NHL", "NCAAB", "NCAAF"])
       },
       // Spread bets (only traditional sportsbooks)
@@ -126,7 +123,7 @@ export function makeSeed(): {
         ]),
         line: faker.helpers.arrayElement(["-2.5", "+3.5", "-1.5", "+1.5", "-7.5", "+2.5"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, -105]),
-        allowedBooks: ["DraftKings", "FanDuel", "BetMGM"],
+        allowedBooks: ["DraftKings", "FanDuel"],
         league: faker.helpers.arrayElement(["NBA", "NFL", "MLB", "NHL", "NCAAB", "NCAAF"])
       },
       // Single player props (only traditional sportsbooks)
@@ -143,10 +140,10 @@ export function makeSeed(): {
         ]),
         line: faker.helpers.arrayElement(["Over 24.5", "Over 275.5", "Over 0.5", "Over 1.5", "Over 8.5", "Over 2.5"]),
         odds: faker.helpers.arrayElement([-110, -105, +100, +110, +120]),
-        allowedBooks: ["DraftKings", "FanDuel", "BetMGM"],
+        allowedBooks: ["DraftKings", "FanDuel"],
         league: faker.helpers.arrayElement(["NBA", "NFL", "MLB", "NHL", "NCAAB", "NCAAF"])
       },
-      // Multi-leg player prop parlays (PrizePicks, Underdog, Sleeper)
+      // Multi-leg player prop parlays (PrizePicks only)
       {
         market: "Player Prop Parlay",
         betType: "parlay" as const,
@@ -160,7 +157,7 @@ export function makeSeed(): {
         ]),
         line: faker.helpers.arrayElement(["2-Leg", "3-Leg", "4-Leg"]),
         odds: faker.helpers.arrayElement([+200, +300, +450, +600, +800, +1000]),
-        allowedBooks: ["PrizePicks", "Underdog", "Sleeper"],
+        allowedBooks: ["PrizePicks"],
         league: faker.helpers.arrayElement(["NBA", "NFL", "MLB", "NHL", "NCAAB", "NCAAF"])
       },
       // Straight bets (totals, etc.) - only traditional sportsbooks
@@ -175,7 +172,7 @@ export function makeSeed(): {
         ]),
         line: faker.helpers.arrayElement(["Over 224.5", "Under 48.5", "Over 8.5", "Under 5.5"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, -105]),
-        allowedBooks: ["DraftKings", "FanDuel", "BetMGM"],
+        allowedBooks: ["DraftKings", "FanDuel"],
         league: faker.helpers.arrayElement(["NBA", "NFL", "MLB", "NHL", "NCAAB", "NCAAF"])
       }
     ];
@@ -415,7 +412,7 @@ export function makeSeed(): {
         const dailyFantasyBet = createParsedBet();
         // Ensure it's a player prop parlay on daily fantasy platforms
         dailyFantasyBet.market = "Player Prop Parlay";
-        dailyFantasyBet.book = faker.helpers.arrayElement(["PrizePicks", "Underdog", "Sleeper"]);
+        dailyFantasyBet.book = faker.helpers.arrayElement(["PrizePicks"]);
         dailyFantasyBet.event = faker.helpers.arrayElement([
           "LeBron Over 24.5 Points + Curry Over 3.5 Threes (LAL vs GSW)",
           "Mahomes Over 275.5 Yards + Kelce Over 6.5 Receptions (KC vs BUF)",
@@ -864,13 +861,13 @@ export function makeSeed(): {
   ];
 
   // Add additional SecuredPicks daily fantasy posts to ensure good representation
-  // Note: These are player prop parlays only - no moneyline bets for Sleeper
+      // Note: These are player prop parlays only - no moneyline bets for PrizePicks
   const securedPicksPartner = partners.find(p => p.name === "SecuredPicks");
   if (securedPicksPartner) {
     for (let i = 0; i < 2; i++) {
       const dailyFantasyBet = createParsedBet();
       dailyFantasyBet.market = "Player Prop Parlay";
-      dailyFantasyBet.book = faker.helpers.arrayElement(["PrizePicks", "Underdog", "Sleeper"]);
+              dailyFantasyBet.book = faker.helpers.arrayElement(["PrizePicks"]);
       dailyFantasyBet.event = faker.helpers.arrayElement([
         "Giannis Over 30.5 Points + Giannis Over 8.5 Rebounds (MIL vs BOS)",
         "Jokic Over 10.5 Assists + Murray Over 20.5 Points + Jokic Over 25.5 Points (DEN vs LAL)",
@@ -1018,10 +1015,7 @@ export function makeSeed(): {
             const bookMap: Record<string, string> = {
               'DraftKings': 'dk',
               'FanDuel': 'fd', 
-              'PrizePicks': 'pp',
-              'Underdog': 'ud',
-              'Sleeper': 'sl',
-              'BetMGM': 'mgm'
+              'PrizePicks': 'pp'
             };
             return bookMap[parsedBet.book] || 'dk';
           })(),
@@ -1043,14 +1037,14 @@ export function makeSeed(): {
   for (let i = 0; i < 25; i++) { // Increased from 15 to 25 for more variety
     const market = faker.helpers.arrayElement(["Moneyline", "Spread", "Total", "Player Prop", "Parlay"]);
     
-    // Ensure Sleeper only gets player prop and parlay bets
+    // Ensure PrizePicks only gets player prop and parlay bets
     let bookId: string;
     if (market === "Moneyline" || market === "Spread" || market === "Total") {
-      // Traditional sportsbook bets - exclude Sleeper
-      bookId = faker.helpers.arrayElement(["dk", "fd", "pp", "ud", "mgm"] as const);
+      // Traditional sportsbook bets - exclude PrizePicks
+      bookId = faker.helpers.arrayElement(["dk", "fd"] as const);
     } else {
-      // Player prop and parlay bets - can include Sleeper
-      bookId = faker.helpers.arrayElement(["dk", "fd", "pp", "ud", "sl", "mgm"] as const);
+      // Player prop and parlay bets - can include PrizePicks
+      bookId = faker.helpers.arrayElement(["dk", "fd", "pp"] as const);
     }
     
     let line = "";

@@ -2,7 +2,7 @@ export type RegionCode = 'CA' | 'NY' | 'NJ' | 'PA' | 'CO' | 'AZ' | 'TX' | 'Other
 
 export type PromoOffer = {
   id: string;
-  providerId: string;          // 'dk' | 'fd' | 'px' | 'ud' | etc
+  providerId: string;          // 'dk' | 'fd' | 'pp'
   providerName: string;        // DraftKings, FanDuel, ProphetX...
   logo: string;                // url or require() later
   title: string;               // short headline

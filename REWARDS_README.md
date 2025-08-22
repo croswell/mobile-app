@@ -36,7 +36,7 @@ The app includes 6 sample promotional offers:
 - Chalkboard Fantasy: $100 deposit match
 - DraftKings: $50 bonus
 - FanDuel: $75 no sweat bet
-- Underdog Fantasy: $25 deposit match
+- PrizePicks: $200 in PrizePicks Cash
 
 ### API Endpoints
 - `getRewards(region)` - Returns available offers for a region

@@ -27,12 +27,6 @@ export default function Logo({ book, size = 'medium' }: LogoProps) {
       return { backgroundColor: '#00D4AA', color: '#000000', initials: 'FD' };
     } else if (normalizedName.includes('prizepicks') || normalizedName.includes('pp')) {
       return { backgroundColor: '#8B5CF6', color: '#FFFFFF', initials: 'PP' };
-    } else if (normalizedName.includes('underdog') || normalizedName.includes('ud')) {
-      return { backgroundColor: '#F97316', color: '#FFFFFF', initials: 'UD' };
-    } else if (normalizedName.includes('sleeper') || normalizedName.includes('sl')) {
-      return { backgroundColor: '#3B82F6', color: '#FFFFFF', initials: 'SL' };
-    } else if (normalizedName.includes('betmgm') || normalizedName.includes('mgm')) {
-      return { backgroundColor: '#F59E0B', color: '#000000', initials: 'BM' };
     } else {
       // Default fallback
       return { backgroundColor: '#6B7280', color: '#FFFFFF', initials: bookName.substring(0, 2).toUpperCase() };

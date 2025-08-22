@@ -35,8 +35,8 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
                      !event.toLowerCase().includes('hrs') && !event.toLowerCase().includes('strikeouts') &&
                      !event.toLowerCase().includes('ks'));
     
-    // Daily fantasy platforms only support player prop parlays
-    if (book === "Sleeper" || book === "PrizePicks" || book === "Underdog") {
+    // Daily fantasy platform only supports player prop parlays
+    if (book === "PrizePicks") {
       if (hasMoneyline || hasSpread || hasTotal) {
         return {
           isValid: false,
@@ -63,7 +63,7 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
     }
     
     // Traditional sportsbooks support all bet types
-    if (book === "DraftKings" || book === "FanDuel" || book === "BetMGM") {
+    if (book === "DraftKings" || book === "FanDuel") {
       return { isValid: true };
     }
     
@@ -194,9 +194,7 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
         // Simple bet-type logic
         if (parsedBet.market === "Player Prop Parlay" || 
             parsedBet.market === "Player Prop" ||
-            parsedBet.book === "PrizePicks" || 
-            parsedBet.book === "Underdog" || 
-            parsedBet.book === "Sleeper") {
+            parsedBet.book === "PrizePicks") {
           units = 0.5; // Parlays or DFS props → 0.5u
         } else {
           units = 1; // Moneyline, spread, straight bets → 1u
