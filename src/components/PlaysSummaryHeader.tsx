@@ -34,7 +34,7 @@ export default function PlaysSummaryHeader({ collapsed = false, atRiskAmount = 0
 
   if (collapsed) {
     return (
-      <View style={tw`bg-neutral-900 px-4 py-3 rounded-2xl border border-neutral-800 mb-4`}>
+      <View style={tw`bg-neutral-900 px-4 py-3 rounded-2xl border border-neutral-800 mb-6`}>
         <View style={tw`flex-row justify-between items-center`}>
           <View>
             <Text style={tw`text-neutral-400 text-xs mb-0.5`}>Total Bankroll</Text>

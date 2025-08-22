@@ -3,6 +3,7 @@ import tw from "../lib/tw";
 import type { ParsedBetT } from "../mocks/models";
 import { prettyOdds, money, whenReadable } from "../lib/format";
 import Logo from "./Logo";
+import { Share } from "lucide-react-native";
 
 interface PlayCardProps {
   bet: {
@@ -80,7 +81,7 @@ export default function PlayCard({ bet, onPress }: PlayCardProps) {
       </View>
 
       {/* Metadata row - league, cities, timestamp */}
-      <View style={tw`mb-2`}>
+      <View style={tw`mb-1`}>
         <View style={tw`flex-row items-center`}>
           <Text style={tw`text-sm text-neutral-400`}>{bet.parsedBet.league}</Text>
           <Text style={tw`text-sm text-neutral-400 ml-2`}>•</Text>
@@ -121,7 +122,7 @@ export default function PlayCard({ bet, onPress }: PlayCardProps) {
 
 
       {/* Bottom row with book info and stake */}
-      <View style={tw`flex-row items-center justify-between`}>
+      <View style={tw`flex-row items-center justify-between mt-2 mb-4`}>
         <View style={tw`flex-row items-center`}>
           <Logo book={bet.parsedBet.book} size="small" />
           <Text style={tw`text-neutral-300 ml-2 text-sm`}>
@@ -135,6 +136,20 @@ export default function PlayCard({ bet, onPress }: PlayCardProps) {
             {prettyOdds(bet.parsedBet.odds)}
           </Text>
         </View>
+      </View>
+
+      {/* Share button */}
+      <View style={tw`w-full`}>
+        <Pressable
+          style={tw`border border-neutral-600 rounded-lg px-4 py-2 flex-row items-center justify-center`}
+          onPress={() => {
+            // TODO: Implement share functionality
+            console.log('Share bet:', bet.id);
+          }}
+        >
+          <Share size={16} color="#9CA3AF" />
+          <Text style={tw`text-neutral-400 text-sm ml-2 font-medium`}>Share</Text>
+        </Pressable>
       </View>
     </Pressable>
   );

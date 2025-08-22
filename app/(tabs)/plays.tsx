@@ -114,7 +114,7 @@ export default function Plays() {
         </Animated.View>
         
         {/* Fixed segmented tabs */}
-        <View style={tw`mb-4`}>
+        <View style={tw`mt-2 mb-4`}>
           <SegmentedTabs
             tabs={[
               { key: "Live", label: "Live", count: live.length },
