@@ -33,17 +33,17 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
-        name="plays" 
-        options={{ 
-          title: "My Plays",
-          tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />
-        }} 
-      />
-      <Tabs.Screen 
         name="rewards" 
         options={{ 
           title: "Rewards",
           tabBarIcon: ({ color, size }) => <Gift size={size} color={color} />
+        }} 
+      />
+      <Tabs.Screen 
+        name="plays" 
+        options={{ 
+          title: "My Plays",
+          tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />
         }} 
       />
 

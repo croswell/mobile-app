@@ -50,6 +50,24 @@ export function makeSeed(): {
       name: "ChillyBets",
       avatar: "chilly-bets",
       isSubscribed: true,
+    },
+    {
+      id: faker.string.uuid(),
+      name: "EliteOdds",
+      avatar: undefined,
+      isSubscribed: false,
+    },
+    {
+      id: faker.string.uuid(),
+      name: "VegasInsider",
+      avatar: undefined,
+      isSubscribed: false,
+    },
+    {
+      id: faker.string.uuid(),
+      name: "SharpShooter",
+      avatar: undefined,
+      isSubscribed: false,
     }
   ];
 
@@ -734,7 +752,7 @@ export function makeSeed(): {
   const activeStakes = [5, 8, 12]; // These sum to exactly $25
   let activeBetCount = 0;
   
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 25; i++) { // Increased from 15 to 25 for more variety
     const league = faker.helpers.arrayElement(["NFL", "NBA", "MLB", "NHL", "NCAAF", "NCAAB"] as const);
     const market = faker.helpers.arrayElement(["Moneyline", "Spread", "Total", "Player Prop", "Parlay"]);
     
@@ -776,22 +794,41 @@ export function makeSeed(): {
       "Michigan vs Ohio State",
       "Duke vs UNC",
       "Chiefs vs Bills",
-      "Heat vs Celtics"
+      "Heat vs Celtics",
+      "Bucks vs Celtics",
+      "Nuggets vs Lakers",
+      "Suns vs Clippers",
+      "Mavs vs Warriors",
+      "76ers vs Knicks",
+      "Pelicans vs Lakers",
+      "Oilers vs Maple Leafs",
+      "Bruins vs Rangers"
     ];
     
     // Determine status and stake
     let status: "active" | "won" | "lost";
     let stake: number;
     
-    if (activeBetCount < 3) {
-      // First 3 bets are active with exact stakes that sum to $25
+    if (activeBetCount < 8) { // Increased from 3 to 8 active bets
+      // First 8 bets are active with future start times
       status = "active";
-      stake = activeStakes[activeBetCount];
+      stake = activeBetCount < 3 ? activeStakes[activeBetCount] : faker.number.int({ min: 10, max: 100 });
       activeBetCount++;
     } else {
       // Remaining bets are completed with random stakes
       status = faker.helpers.arrayElement(["won", "lost"] as const);
       stake = faker.number.int({ min: 10, max: 1000 });
+    }
+    
+    // Ensure active bets have future start times
+    let startTime: Date;
+    if (status === "active") {
+      // Active bets start between 1 hour and 7 days from now
+      const hoursFromNow = faker.number.int({ min: 1, max: 168 }); // 1 hour to 7 days
+      startTime = new Date(Date.now() + (hoursFromNow * 60 * 60 * 1000));
+    } else {
+      // Completed bets can be in the past or future
+      startTime = faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) });
     }
     
     const bet: BetT = {
@@ -803,7 +840,7 @@ export function makeSeed(): {
       odds,
       bookId,
       partnerId: pick(partners).id,
-      startTime: faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) }),
+      startTime,
       status,
       stake
     };
