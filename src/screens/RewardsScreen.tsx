@@ -60,9 +60,6 @@ export default function RewardsScreen() {
 
   return (
     <View style={tw`flex-1 bg-neutral-950 px-4 pt-4`}>
-      <Text style={tw`text-white text-3xl font-extrabold mb-1`}>Rewards</Text>
-      <Text style={tw`text-neutral-400 mb-3`}>Total Promo Value <Dollar value={totalValue} /></Text>
-
       {/* Tabs */}
       <View style={{ marginBottom: 12 }}>
         <SegmentedTabs
@@ -74,6 +71,7 @@ export default function RewardsScreen() {
           onChange={(key) => setTab(key as "bonuses" | "refer")}
         />
       </View>
+
       {tab === "bonuses" ? (
         <FlatList
           data={state.promos}

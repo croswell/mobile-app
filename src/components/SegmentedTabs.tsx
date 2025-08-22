@@ -14,8 +14,8 @@ export default function SegmentedTabs({
   tabs,
   value,
   onChange,
-  paddingH = 14,
-  paddingV = 8,
+  paddingH = 12,  // Reduced from 14
+  paddingV = 6,   // Reduced from 8
 }: Props) {
   const [containerX, setContainerX] = useState(0);
   const [layouts, setLayouts] = useState<Record<string, { x: number; width: number }>>({});
@@ -28,8 +28,13 @@ export default function SegmentedTabs({
   useEffect(() => {
     const target = layouts[selected.key];
     if (!target) return;
+    
+    // Calculate the target position and width
+    const targetLeft = target.x - containerX;
+    const targetWidth = target.width;
+    
     Animated.spring(leftAnim, {
-      toValue: target.x - containerX,
+      toValue: targetLeft,
       useNativeDriver: false, // animating layout properties (left/width)
       damping: 25,
       stiffness: 300,
@@ -37,7 +42,7 @@ export default function SegmentedTabs({
     }).start();
 
     Animated.timing(widthAnim, {
-      toValue: target.width,
+      toValue: targetWidth,
       duration: 150,
       useNativeDriver: false,
     }).start();
@@ -51,7 +56,7 @@ export default function SegmentedTabs({
     (key: string) =>
     (e: LayoutChangeEvent) => {
       const { x, width } = e.nativeEvent.layout;
-      setLayouts(prev => (prev[key]?.width === width && prev[key]?.x === x ? prev : { ...prev, [key]: { x, width } }));
+      setLayouts(prev => ({ ...prev, [key]: { x, width } }));
     };
 
   return (
@@ -68,7 +73,7 @@ export default function SegmentedTabs({
             {
               left: leftAnim,
               width: widthAnim,
-              borderRadius: 6,
+              borderRadius: 8,
             },
           ]}
         />
@@ -89,7 +94,9 @@ export default function SegmentedTabs({
                 paddingVertical: paddingV, 
                 borderRadius: 8,
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                // Ensure each tab takes exactly half the width
+                width: `${100 / tabs.length}%`,
               }}
             >
               <Text style={[styles.label, isActive ? styles.activeLabel : styles.inactiveLabel]} numberOfLines={1}>
@@ -107,6 +114,10 @@ const styles = StyleSheet.create({
   wrap: {
     position: "relative",
     alignSelf: "stretch",
+    minHeight: 36,
+    borderRadius: 8,
+    overflow: "hidden", // Ensure clean rounded appearance
+    padding: 0,
   },
   track: {
     position: "absolute",
@@ -122,11 +133,16 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: "#52525b", // neutral-600
+    borderRadius: 8,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    minHeight: 36,
+    position: "relative",
+    zIndex: 1,
+    padding: 0,
   },
   label: {
     fontSize: 16,

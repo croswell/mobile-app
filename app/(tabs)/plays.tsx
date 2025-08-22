@@ -3,6 +3,7 @@ import { View, Text, Pressable, FlatList } from "react-native";
 import tw from "../../src/lib/tw";
 import { useData } from "../../src/state/data";
 import BetRow from "../../src/components/BetRow";
+import SegmentedTabs from "../../src/components/SegmentedTabs";
 import type { BetT } from "../../src/mocks/models";
 
 type TabKey = "Active" | "Completed";
@@ -27,26 +28,17 @@ export default function Plays() {
   const data: BetT[] = tab === "Active" ? active : completed;
 
   return (
-    <View style={tw`flex-1 bg-neutral-950`}>
-      {/* header summary */}
-      <View style={tw`px-4 pt-4`}>
-        <Text style={tw`text-xl font-bold mb-2 text-neutral-100`}>My Plays</Text>
-      </View>
-
-      {/* segmented control */}
-      <View style={tw`flex-row px-4 pb-2 gap-2`}>
-        {(["Active","Completed"] as const).map(k => {
-          const on = tab === k;
-          return (
-            <Pressable
-              key={k}
-              onPress={()=>setTab(k)}
-              style={tw`${on ? "bg-neutral-100 border-neutral-100" : "bg-neutral-900 border-neutral-700"} border rounded-full px-4 py-2`}
-            >
-              <Text style={tw`${on ? "text-neutral-950" : "text-neutral-300"} text-sm`}>{k}</Text>
-            </Pressable>
-          );
-        })}
+    <View style={tw`flex-1 bg-neutral-950 px-4 pt-4`}>
+      {/* Segmented tabs */}
+      <View style={{ marginBottom: 12 }}>
+        <SegmentedTabs
+          tabs={[
+            { key: "Active", label: "Active" },
+            { key: "Completed", label: "Completed" },
+          ]}
+          value={tab}
+          onChange={(key) => setTab(key as TabKey)}
+        />
       </View>
 
       {/* list */}
