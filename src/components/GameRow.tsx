@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import tw from "../lib/tw";
 import type { BetT } from "../mocks/models";
-import { prettyOdds, when } from "../lib/format";
+import { prettyOdds, whenReadable } from "../lib/format";
 import Logo from "./Logo";
 
 type Props = {
@@ -50,7 +50,7 @@ export default function GameRow({ game, startTime, league, bets }: Props) {
     <View style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-4`}>
       <View style={tw`flex-row justify-between mb-1`}>
         <Text style={tw`font-semibold text-neutral-100`}>{game}</Text>
-        <Text style={tw`text-xs text-neutral-400`}>{when(startTime)}</Text>
+        <Text style={tw`text-xs text-neutral-400`}>{whenReadable(startTime)}</Text>
       </View>
       <Text style={tw`text-xs text-neutral-400 mb-3`}>{league}</Text>
 

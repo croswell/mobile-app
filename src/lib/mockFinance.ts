@@ -21,9 +21,15 @@ export const financeApi = {
     await sleep(); return accounts;
   },
 
-  // At risk = sum of stake on Active plays
+  // At risk = sum of stake on Active plays (including live and scheduled)
   async getAtRisk(): Promise<number> {
-    return 25.00; // Fixed at $25 for now
+    const { bets } = useData.getState();
+    
+    // Calculate sum of stakes from active bets (both live and scheduled)
+    const activeBets = bets.filter(b => b.status === "active" || b.status === "live");
+    const totalAtRisk = activeBets.reduce((sum, bet) => sum + (bet.stake || 0), 0);
+    
+    return totalAtRisk;
   },
 
   // Total bankroll = sum(accounts cash) + atRisk

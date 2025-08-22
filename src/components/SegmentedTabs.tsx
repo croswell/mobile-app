@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, LayoutChangeEvent, Animated, StyleSheet } from "react-native";
+import tw from "../lib/tw";
 
-type Tab = { key: string; label: string };
+type Tab = { key: string; label: string; count?: number };
 type Props = {
   tabs: Tab[];
   value: string;
@@ -108,9 +109,24 @@ export default function SegmentedTabs({
                 width: `${100 / tabs.length}%`,
               }}
             >
-              <Text style={[styles.label, isActive ? styles.activeLabel : styles.inactiveLabel]} numberOfLines={1}>
-                {t.label}
-              </Text>
+              <View style={tw`flex-row items-center`}>
+                <Text style={[styles.label, isActive ? styles.activeLabel : styles.inactiveLabel]} numberOfLines={1}>
+                  {t.label}
+                </Text>
+                {t.count !== undefined && t.count > 0 && (
+                  <View style={[
+                    tw`ml-2 px-2 py-0.5 rounded-full`,
+                    isActive ? tw`bg-neutral-50` : tw`bg-neutral-700`
+                  ]}>
+                    <Text style={[
+                      tw`text-xs font-bold`,
+                      isActive ? tw`text-neutral-900` : tw`text-neutral-300`
+                    ]}>
+                      {t.count}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </Pressable>
           );
         })}

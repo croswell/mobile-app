@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import tw from "../lib/tw";
 import type { BetT } from "../mocks/models";
-import { prettyOdds, when } from "../lib/format";
+import { prettyOdds, whenReadable } from "../lib/format";
 import Logo from "./Logo";
 
 interface BetCardProps {
@@ -81,7 +81,7 @@ export default function BetCard({ bet, onPress }: BetCardProps) {
           {bet.game}
         </Text>
         <Text style={tw`text-sm text-neutral-400 mb-1`}>{bet.league}</Text>
-        <Text style={tw`text-xs text-neutral-500`}>{when(bet.startTime)}</Text>
+        <Text style={tw`text-xs text-neutral-500`}>{whenReadable(bet.startTime)}</Text>
       </View>
 
       {/* Bet details */}

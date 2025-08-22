@@ -73,8 +73,22 @@ export function makeSeed(): {
 
   // Create realistic parsed bet data for posts
   const createParsedBet = (): ParsedBetT => {
-    // Generate event time in the near future
-    const eventTime = faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) }).toISOString();
+    // Generate event time - some in the past (live), some in the future (upcoming)
+    let eventTime: string;
+    const timeType = faker.helpers.arrayElement(['live', 'upcoming', 'completed']);
+    
+    if (timeType === 'live') {
+      // Live game: started 1-2 hours ago
+      const hoursAgo = faker.number.int({ min: 1, max: 2 });
+      eventTime = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+    } else if (timeType === 'upcoming') {
+      // Upcoming game: starts in 1-7 days
+      eventTime = faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) }).toISOString();
+    } else {
+      // Completed game: finished 1-3 days ago
+      const daysAgo = faker.number.int({ min: 1, max: 3 });
+      eventTime = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+    }
     
     // Different bet types with realistic data and proper league mapping
     const betTypes = [
@@ -82,14 +96,14 @@ export function makeSeed(): {
       {
         market: "Moneyline",
         event: faker.helpers.arrayElement([
-          "Lakers vs Warriors",
-          "Cowboys vs Eagles", 
-          "Yankees vs Red Sox",
-          "Bruins vs Maple Leafs",
-          "Michigan vs Ohio State",
-          "Duke vs UNC",
-          "Chiefs vs Bills",
-          "Heat vs Celtics"
+          "Lakers vs Warriors (LAL vs GSW)",
+          "Cowboys vs Eagles (DAL vs PHI)", 
+          "Yankees vs Red Sox (NYY vs BOS)",
+          "Bruins vs Maple Leafs (BOS vs TOR)",
+          "Michigan vs Ohio State (MICH vs OSU)",
+          "Duke vs UNC (DUKE vs UNC)",
+          "Chiefs vs Bills (KC vs BUF)",
+          "Heat vs Celtics (MIA vs BOS)"
         ]),
         line: faker.helpers.arrayElement(["+120", "-150", "+180", "-200", "+110", "-130"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, +110, +120, +150, +180]),
@@ -100,12 +114,12 @@ export function makeSeed(): {
       {
         market: "Spread",
         event: faker.helpers.arrayElement([
-          "Lakers -2.5 vs Suns",
-          "Cowboys +3.5 @ Eagles",
-          "Yankees -1.5 vs Red Sox",
-          "Bruins +1.5 @ Maple Leafs",
-          "Michigan -7.5 vs Ohio State",
-          "Duke +2.5 @ UNC"
+          "Lakers -2.5 vs Suns (LAL vs PHX)",
+          "Cowboys +3.5 @ Eagles (DAL vs PHI)",
+          "Yankees -1.5 vs Red Sox (NYY vs BOS)",
+          "Bruins +1.5 @ Maple Leafs (BOS vs TOR)",
+          "Michigan -7.5 vs Ohio State (MICH vs OSU)",
+          "Duke +2.5 @ UNC (DUKE vs UNC)"
         ]),
         line: faker.helpers.arrayElement(["-2.5", "+3.5", "-1.5", "+1.5", "-7.5", "+2.5"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, -105]),
@@ -148,10 +162,10 @@ export function makeSeed(): {
       {
         market: "Total",
         event: faker.helpers.arrayElement([
-          "Lakers vs Warriors Over 224.5",
-          "Cowboys vs Eagles Under 48.5",
-          "Yankees vs Red Sox Over 8.5",
-          "Bruins vs Maple Leafs Under 5.5"
+          "Lakers vs Warriors Over 224.5 (LAL vs GSW)",
+          "Cowboys vs Eagles Under 48.5 (DAL vs PHI)",
+          "Yankees vs Red Sox Over 8.5 (NYY vs BOS)",
+          "Bruins vs Maple Leafs Under 5.5 (BOS vs TOR)"
         ]),
         line: faker.helpers.arrayElement(["Over 224.5", "Under 48.5", "Over 8.5", "Under 5.5"]),
         odds: faker.helpers.arrayElement([-110, -115, -120, -105]),
@@ -312,12 +326,44 @@ export function makeSeed(): {
           "⭐ I love these parlays. Multiple players, one bet!"
         ]);
         
+        // Update daily fantasy captions to use sport-appropriate emojis
+        const getDailyFantasySportCaption = (league: string) => {
+          const baseCaptions = [
+            "Daily fantasy special! The value is incredible here.",
+            "Multi-leg parlay with amazing odds!",
+            "The best combination for today's slate.",
+            "I love these parlays. Multiple players, one bet!"
+          ];
+          
+          const baseCaption = faker.helpers.arrayElement(baseCaptions);
+          
+          // Add sport-appropriate emoji prefix
+          switch (league) {
+            case "NFL":
+              return `🏈 ${baseCaption}`;
+            case "NBA":
+              return `🏀 ${baseCaption}`;
+            case "MLB":
+              return `⚾ ${baseCaption}`;
+            case "NHL":
+              return `🏒 ${baseCaption}`;
+            case "NCAAF":
+              return `🏈 ${baseCaption}`;
+            case "NCAAB":
+              return `🏀 ${baseCaption}`;
+            default:
+              return `🎲 ${baseCaption}`;
+          }
+        };
+        
+        const dailyFantasySportCaption = getDailyFantasySportCaption(dailyFantasyBet.league);
+        
         posts.push({
           id: faker.string.uuid(),
           partnerId: partner.id,
           createdAt: faker.date.recent({ days: 3 }),
           extraction: "parsed" as const,
-          text: postText,
+          text: dailyFantasySportCaption,
           betIds: [],
           parsed: [dailyFantasyBet],
           attachments: [],
@@ -336,12 +382,46 @@ export function makeSeed(): {
           "⭐ The matchup favors us here. Time to capitalize."
         ]);
         
+        // Update the caption to use sport-appropriate emojis
+        const getSportAppropriateCaption = (league: string) => {
+          const baseCaptions = [
+            "This is my lock of the day. The value is too good to pass up!",
+            "I've been watching this matchup all season and I love the spot.",
+            "The numbers don't lie. This is a strong play based on recent trends.",
+            "I've been waiting for this matchup. The setup is perfect.",
+            "This bet has been printing money lately. I'm not stopping now.",
+            "The matchup favors us here. Time to capitalize."
+          ];
+          
+          const baseCaption = faker.helpers.arrayElement(baseCaptions);
+          
+          // Add sport-appropriate emoji prefix
+          switch (league) {
+            case "NFL":
+              return `🏈 ${baseCaption}`;
+            case "NBA":
+              return `🏀 ${baseCaption}`;
+            case "MLB":
+              return `⚾ ${baseCaption}`;
+            case "NHL":
+              return `🏒 ${baseCaption}`;
+            case "NCAAF":
+              return `🏈 ${baseCaption}`;
+            case "NCAAB":
+              return `🏀 ${baseCaption}`;
+            default:
+              return `🔥 ${baseCaption}`;
+          }
+        };
+        
+        const sportAppropriateCaption = getSportAppropriateCaption(parsedBet.league);
+        
         posts.push({
           id: faker.string.uuid(),
           partnerId: partner.id,
           createdAt: faker.date.recent({ days: 3 }),
           extraction: "parsed" as const,
-          text: postText,
+          text: sportAppropriateCaption,
           betIds: [],
           parsed: [parsedBet],
           attachments: [],
@@ -383,16 +463,43 @@ export function makeSeed(): {
         "💪 Player performance trends are pointing to some easy money tonight. Let's ride the wave!"
       ];
       
-      const text = isLongText 
-        ? faker.helpers.arrayElement(bettingTexts) + " " + faker.lorem.sentences({ min: 6, max: 10 })
-        : faker.helpers.arrayElement(bettingTexts);
+      // Update unparsed betting posts to use sport-appropriate emojis
+      const getUnparsedSportCaption = () => {
+        const baseCaptions = [
+          "Looking at the spreads for tonight's games. Some interesting value plays out there!",
+          "Been analyzing the player props all morning. The over/under lines are looking juicy today.",
+          "Tonight's slate has some great betting opportunities. I'm eyeing a few specific matchups.",
+          "The moneyline odds are shifting in our favor. Time to lock in some bets!",
+          "Player prop parlays are where the real money is made. Love these multi-leg bets.",
+          "Found some incredible value on the totals tonight. The books are giving us free money.",
+          "The early lines are out and I'm seeing some serious value. Let's capitalize on these odds.",
+          "Tonight's games are setting up perfectly for some strategic betting. The value is everywhere!",
+          "The line movement is telling us everything we need to know. Smart money is flowing in.",
+          "Daily fantasy and traditional betting both have great opportunities tonight. Let's get it!",
+          "Basketball props are my favorite. The over/under lines are so predictable this season.",
+          "Soccer betting is heating up. The goal totals are looking very attractive right now.",
+          "I've been tracking this team's performance against the spread. The numbers don't lie.",
+          "The parlay potential tonight is insane. Multiple games with great value.",
+          "Player performance trends are pointing to some easy money tonight. Let's ride the wave!"
+        ];
+        
+        const baseCaption = faker.helpers.arrayElement(baseCaptions);
+        
+        // Use generic betting emojis for unparsed posts since we don't know the specific sport
+        const bettingEmojis = ["🔥", "📊", "🎯", "⚡", "💎", "⭐", "🚀", "📈", "🎲", "💪"];
+        const emoji = faker.helpers.arrayElement(bettingEmojis);
+        
+        return `${emoji} ${baseCaption}`;
+      };
+      
+      const unparsedSportCaption = getUnparsedSportCaption();
 
       posts.push({
         id: faker.string.uuid(),
         partnerId: partner.id,
         createdAt: faker.date.recent({ days: 3 }),
         extraction: "unparsed" as const,
-        text,
+        text: unparsedSportCaption,
         betIds: [],
         parsed: [],
         attachments,
@@ -420,19 +527,19 @@ export function makeSeed(): {
 
     // Generate betting-related text for these additional posts
     const additionalBettingTexts = [
-      "🎯 The analytics are showing some incredible betting value tonight. I've been crunching the numbers all day and the patterns are clear. The line movements are telling us exactly where the smart money is going. When you see this kind of consistent movement, it's usually a sign that the books are adjusting to real market pressure. I'm particularly excited about the player props tonight - there are some over/under lines that are way off from what the advanced metrics suggest. This is exactly the kind of edge we look for in profitable betting. The key is to act quickly before the lines adjust further.",
-      "🔥 Tonight's slate is absolutely loaded with betting opportunities. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. I'm especially bullish on the parlay potential tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets around those opportunities.",
-      "📊 The betting landscape tonight is absolutely perfect for strategic plays. I've analyzed every game on the slate and the value is everywhere you look. The moneyline odds are shifting in our favor, the spread lines are offering great value, and the player props are looking very predictable based on recent trends. This is the kind of night where smart betting can really pay off. I'm particularly excited about the over/under totals - there are several games where the lines seem way off from what the advanced analytics suggest. When you see this kind of discrepancy, it's usually a sign that the books are behind on the latest data.",
-      "⚡ Tonight's games are setting up perfectly for some serious betting action. I've been monitoring the odds all day and the value is incredible. The early lines are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. I'm particularly excited about the multi-leg parlays tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets strategically around those opportunities."
+      "🏈 The analytics are showing some incredible betting value tonight. I've been crunching the numbers all day and the patterns are clear. The line movements are telling us exactly where the smart money is going. When you see this kind of consistent movement, it's usually a sign that the books are adjusting to real market pressure. I'm particularly excited about the player props tonight - there are some over/under lines that are way off from what the advanced metrics suggest. This is exactly the kind of edge we look for in profitable betting. The key is to act quickly before the lines adjust further.",
+      "🏀 Tonight's slate is absolutely loaded with betting opportunities. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. I'm especially bullish on the parlay potential tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets around those opportunities.",
+      "⚾ The betting landscape tonight is absolutely perfect for strategic plays. I've analyzed every game on the slate and the value is everywhere you look. The moneyline odds are shifting in our favor, the spread lines are offering great value, and the player props are looking very predictable based on recent trends. This is the kind of night where smart betting can really pay off. I'm particularly excited about the over/under totals - there are several games where the lines seem way off from what the advanced analytics suggest. When you see this kind of discrepancy, it's usually a sign that the books are behind on the latest data.",
+      "🏒 Tonight's games are setting up perfectly for some serious betting action. I've been monitoring the odds all day and the value is incredible. The early lines are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. I'm particularly excited about the multi-leg parlays tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets strategically around those opportunities."
     ];
 
     const text = isLongText 
       ? faker.helpers.arrayElement(additionalBettingTexts)
       : faker.helpers.arrayElement([
-          "🎯 The betting value tonight is incredible. Lines are moving in our favor!",
-          "🔥 Tonight's slate has some serious betting opportunities. The value is everywhere!",
-          "📊 The analytics are showing some great betting value tonight. Let's capitalize!",
-          "⚡ Tonight's games are perfect for strategic betting. The odds are in our favor!"
+          "🏈 The betting value tonight is incredible. Lines are moving in our favor!",
+          "🏀 Tonight's slate has some serious betting opportunities. The value is everywhere!",
+          "⚾ The analytics are showing some great betting value tonight. Let's capitalize!",
+          "🏒 Tonight's games are perfect for strategic betting. The odds are in our favor!"
         ]);
 
     posts.push({
@@ -456,7 +563,7 @@ export function makeSeed(): {
       partnerId: partners[0].id,
       createdAt: new Date(),
       extraction: "unparsed",
-      text: "📊 Check out these betting analytics! The line movement is showing incredible value tonight. 📸",
+      text: "🏈 Check out these betting analytics! The line movement is showing incredible value tonight. 📸",
       betIds: [],
       parsed: [],
       attachments: [{
@@ -473,7 +580,7 @@ export function makeSeed(): {
       partnerId: partners[1].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
       extraction: "unparsed",
-      text: "🎯 Two betting charts side by side - perfect for comparing the odds and line movements! 🔍",
+      text: "🏀 Two betting charts side by side - perfect for comparing the odds and line movements! 🔍",
       betIds: [],
       parsed: [],
       attachments: [
@@ -498,7 +605,7 @@ export function makeSeed(): {
       partnerId: partners[0].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
       extraction: "unparsed",
-      text: "🔥 Three betting insights - first two show the spread analysis, third reveals the player prop value! 📸✨",
+      text: "⚾ Three betting insights - first two show the spread analysis, third reveals the player prop value! 📸✨",
       betIds: [],
       parsed: [],
       attachments: [
@@ -529,7 +636,7 @@ export function makeSeed(): {
       partnerId: partners[2].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
       extraction: "unparsed",
-      text: "📈 Scroll through these betting charts and analytics! The value is everywhere tonight! 🎨✨",
+      text: "🏒 Scroll through these betting charts and analytics! The value is everywhere tonight! 🎨✨",
       betIds: [],
       parsed: [],
       attachments: [
@@ -576,7 +683,7 @@ export function makeSeed(): {
       partnerId: partners[0].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
       extraction: "unparsed",
-      text: "🔥 Tonight's betting analysis is absolutely incredible! I've been crunching the numbers all day and the value is everywhere you look. The line movements are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. I'm particularly excited about the multi-leg parlays tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets strategically around those opportunities. The analytics are showing some incredible betting value tonight. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. This is exactly the kind of edge we look for in profitable betting! 🚀",
+      text: "🏈 Tonight's betting analysis is absolutely incredible! I've been crunching the numbers all day and the value is everywhere you look. The line movements are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. I'm particularly excited about the multi-leg parlays tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets strategically around those opportunities. The analytics are showing some incredible betting value tonight. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. This is exactly the kind of edge we look for in profitable betting! 🚀",
       betIds: [],
       parsed: [],
       attachments: [],
@@ -588,7 +695,7 @@ export function makeSeed(): {
       partnerId: partners[1].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
       extraction: "unparsed",
-      text: "📊 The betting landscape tonight is absolutely perfect for strategic plays. I've analyzed every game on the slate and the value is everywhere you look. The moneyline odds are shifting in our favor, the spread lines are offering great value, and the player props are looking very predictable based on recent trends. This is the kind of night where smart betting can really pay off. I'm particularly excited about the over/under totals - there are several games where the lines seem way off from what the advanced analytics suggest. When you see this kind of discrepancy, it's usually a sign that the books are behind on the latest data. The early lines are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. This allows users to get a preview of the content without having to scroll through extremely long posts in their feed. Perfect! Now we have multiple posts to test with. 📝",
+      text: "🏀 The betting landscape tonight is absolutely perfect for strategic plays. I've analyzed every game on the slate and the value is everywhere you look. The moneyline odds are shifting in our favor, the spread lines are offering great value, and the player props are looking very predictable based on recent trends. This is the kind of night where smart betting can really pay off. I'm particularly excited about the over/under totals - there are several games where the lines seem way off from what the advanced analytics suggest. When you see this kind of discrepancy, it's usually a sign that the books are behind on the latest data. The early lines are showing some serious opportunities, especially in the player prop markets. When you combine the recent performance data with the current odds, we're looking at some very profitable betting scenarios. This allows users to get a preview of the content without having to scroll through extremely long posts in their feed. Perfect! Now we have multiple posts to test with. 📝",
       betIds: [],
       parsed: [],
       attachments: [],
@@ -600,7 +707,7 @@ export function makeSeed(): {
       partnerId: partners[2].id,
       createdAt: new Date(Date.now() - 1000 * 60 * 90), // 1.5 hours ago
       extraction: "unparsed",
-      text: "🎯 Tonight's slate is absolutely loaded with betting opportunities. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. I'm especially bullish on the parlay potential tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets around those opportunities. The goal is to create a smooth user experience where long posts don't dominate the feed but users can still access the full content when they want to. This approach balances content discovery with readability. When users see these long posts, they'll see a preview followed by the option to expand. Tapping 'Show more' should smoothly transition to the modal view. Excellent! Now we have three guaranteed long posts for testing. 🎯",
+      text: "⚾ Tonight's slate is absolutely loaded with betting opportunities. I've been tracking the line movements since this morning and the value is incredible. The spreads are shifting in our favor on multiple games, and the player prop totals are looking very attractive. When you combine this with the recent performance trends, we're looking at some seriously profitable betting scenarios. I'm especially bullish on the parlay potential tonight - there are several correlated bets that could pay off big. The key is to identify which games have the strongest value and build your bets around those opportunities. The goal is to create a smooth user experience where long posts don't dominate the feed but users can still access the full content when they want to. This approach balances content discovery with readability. When users see these long posts, they'll see a preview followed by the option to expand. Tapping 'Show more' should smoothly transition to the modal view. Excellent! Now we have three guaranteed long posts for testing. 🎯",
       betIds: [],
       parsed: [],
       attachments: [],
@@ -695,12 +802,46 @@ export function makeSeed(): {
         "📊 The analytics show this has a 65% hit rate."
       ]);
       
+      // Update SecuredPicks daily fantasy captions to use sport-appropriate emojis
+      const getSecuredPicksSportCaption = (league: string) => {
+        const baseCaptions = [
+          "Daily fantasy special! The value is incredible here.",
+          "Multi-leg parlay with amazing odds!",
+          "The best combination for today's slate.",
+          "I love these parlays. Multiple players, one bet!",
+          "Daily fantasy parlay that's been printing money!",
+          "The analytics show this has a 65% hit rate."
+        ];
+        
+        const baseCaption = faker.helpers.arrayElement(baseCaptions);
+        
+        // Add sport-appropriate emoji prefix
+        switch (league) {
+          case "NFL":
+            return `🏈 ${baseCaption}`;
+          case "NBA":
+            return `🏀 ${baseCaption}`;
+          case "MLB":
+            return `⚾ ${baseCaption}`;
+          case "NHL":
+            return `🏒 ${baseCaption}`;
+          case "NCAAF":
+            return `🏈 ${baseCaption}`;
+          case "NCAAB":
+            return `🏀 ${baseCaption}`;
+          default:
+            return `🎲 ${baseCaption}`;
+        }
+      };
+      
+      const securedPicksSportCaption = getSecuredPicksSportCaption(dailyFantasyBet.league);
+      
       posts.push({
         id: faker.string.uuid(),
         partnerId: securedPicksPartner.id,
         createdAt: faker.date.recent({ days: 3 }),
         extraction: "parsed" as const,
-        text: postText,
+        text: securedPicksSportCaption,
         betIds: [],
         parsed: [dailyFantasyBet],
         attachments: [],
@@ -748,12 +889,11 @@ export function makeSeed(): {
   }
 
   // Add some additional standalone bets for variety
-  // Create exactly $25 worth of active bets
-  const activeStakes = [5, 8, 12]; // These sum to exactly $25
+  // Create exactly $25 worth of active bets with minimum $5 each
+  const activeStakes = [5, 5, 5, 5, 5]; // 5 bets of $5 each = $25 total
   let activeBetCount = 0;
   
   for (let i = 0; i < 25; i++) { // Increased from 15 to 25 for more variety
-    const league = faker.helpers.arrayElement(["NFL", "NBA", "MLB", "NHL", "NCAAF", "NCAAB"] as const);
     const market = faker.helpers.arrayElement(["Moneyline", "Spread", "Total", "Player Prop", "Parlay"]);
     
     // Ensure Sleeper only gets player prop and parlay bets
@@ -786,38 +926,57 @@ export function makeSeed(): {
       odds = faker.helpers.arrayElement([+200, +300, +450, +600, +800, +1000]);
     }
     
-    const games = [
-      "Lakers vs Warriors",
-      "Cowboys vs Eagles", 
-      "Yankees vs Red Sox",
-      "Bruins vs Maple Leafs",
-      "Michigan vs Ohio State",
-      "Duke vs UNC",
-      "Chiefs vs Bills",
-      "Heat vs Celtics",
-      "Bucks vs Celtics",
-      "Nuggets vs Lakers",
-      "Suns vs Clippers",
-      "Mavs vs Warriors",
-      "76ers vs Knicks",
-      "Pelicans vs Lakers",
-      "Oilers vs Maple Leafs",
-      "Bruins vs Rangers"
-    ];
+    // Create game-to-league mappings to ensure consistency
+    const gameLeagueMap: Record<string, BetT["league"]> = {
+      // NBA games
+      "Lakers vs Warriors": "NBA",
+      "Heat vs Celtics": "NBA", 
+      "Bucks vs Celtics": "NBA",
+      "Nuggets vs Lakers": "NBA",
+      "Suns vs Clippers": "NBA",
+      "Mavs vs Warriors": "NBA",
+      "76ers vs Knicks": "NBA",
+      "Pelicans vs Lakers": "NBA",
+      
+      // NFL games
+      "Cowboys vs Eagles": "NFL",
+      "Chiefs vs Bills": "NFL",
+      
+      // MLB games
+      "Yankees vs Red Sox": "MLB",
+      
+      // NHL games
+      "Bruins vs Maple Leafs": "NHL",
+      "Oilers vs Maple Leafs": "NHL",
+      "Bruins vs Rangers": "NHL",
+      
+      // College games
+      "Michigan vs Ohio State": "NCAAF",
+      "Duke vs UNC": "NCAAB"
+    };
     
-    // Determine status and stake
-    let status: "active" | "won" | "lost";
+    // Select a random game and use its mapped league
+    const game = faker.helpers.arrayElement(Object.keys(gameLeagueMap));
+    const league = gameLeagueMap[game];
+    
+    // Determine status, stake, and game state
+    let status: "active" | "live" | "won" | "lost";
     let stake: number;
+    let gameState: "scheduled" | "in_progress" | "final";
     
-    if (activeBetCount < 8) { // Increased from 3 to 8 active bets
-      // First 8 bets are active with future start times
+    if (activeBetCount < 5) { // First 5 bets are active (upcoming) with $5 each = $25 total
       status = "active";
-      stake = activeBetCount < 3 ? activeStakes[activeBetCount] : faker.number.int({ min: 10, max: 100 });
+      stake = activeStakes[activeBetCount]; // Use the predefined stakes that sum to $25
+      gameState = "scheduled";
       activeBetCount++;
-    } else {
-      // Remaining bets are completed with random stakes
+    } else if (i < 8) { // Next 3 bets are live (games in progress) - no additional risk
+      status = "live";
+      stake = 0; // Live bets don't add to "at risk" amount
+      gameState = "in_progress";
+    } else { // Remaining bets are completed
       status = faker.helpers.arrayElement(["won", "lost"] as const);
       stake = faker.number.int({ min: 10, max: 1000 });
+      gameState = "final";
     }
     
     // Ensure active bets have future start times
@@ -826,6 +985,10 @@ export function makeSeed(): {
       // Active bets start between 1 hour and 7 days from now
       const hoursFromNow = faker.number.int({ min: 1, max: 168 }); // 1 hour to 7 days
       startTime = new Date(Date.now() + (hoursFromNow * 60 * 60 * 1000));
+    } else if (status === "live") {
+      // Live bets started recently (within last 2 hours)
+      const hoursAgo = faker.number.int({ min: 0, max: 2 });
+      startTime = new Date(Date.now() - (hoursAgo * 60 * 60 * 1000));
     } else {
       // Completed bets can be in the past or future
       startTime = faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) });
@@ -834,7 +997,7 @@ export function makeSeed(): {
     const bet: BetT = {
       id: faker.string.uuid(),
       league,
-      game: faker.helpers.arrayElement(games),
+      game,
       market,
       line,
       odds,
@@ -842,7 +1005,8 @@ export function makeSeed(): {
       partnerId: pick(partners).id,
       startTime,
       status,
-      stake
+      stake,
+      gameState
     };
     
     bets.push(bet);

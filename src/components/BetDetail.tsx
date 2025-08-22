@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import tw from "../lib/tw";
 import type { BetT } from "../mocks/models";
-import { prettyOdds, when } from "../lib/format";
+import { prettyOdds, whenReadable } from "../lib/format";
 import Logo from "./Logo";
 
 export default function BetDetail({ bet }: { bet: BetT }) {
@@ -105,7 +105,7 @@ export default function BetDetail({ bet }: { bet: BetT }) {
           {getBetTypeDetails(bet)}
         </Text>
         <Text style={tw`text-base text-neutral-300`}>
-          {when(bet.startTime)}
+          {whenReadable(bet.startTime)}
         </Text>
       </View>
 

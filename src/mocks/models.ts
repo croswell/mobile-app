@@ -23,8 +23,9 @@ export const Bet = z.object({
   bookId: z.string(),
   partnerId: z.string(),
   startTime: z.date(),
-  status: z.enum(["active","won","lost","void"]),
+  status: z.enum(["active","live","won","lost","void"]),
   stake: z.number().optional(),
+  gameState: z.enum(["scheduled","in_progress","final"]).optional(), // New field for game state
 });
 
 // New parsed bet structure for posts

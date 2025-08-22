@@ -18,3 +18,38 @@ export const when = (d: Date) => {
   const days = Math.floor(h / 24);
   return ms >= 0 ? `in ${days}d` : `${days}d ago`;
 };
+
+export const whenReadable = (d: Date) => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  
+  const targetDate = new Date(d);
+  targetDate.setHours(0, 0, 0, 0);
+  
+  if (targetDate.getTime() === today.getTime()) {
+    return `Today at ${d.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    })}`;
+  } else if (targetDate.getTime() === tomorrow.getTime()) {
+    return `Tomorrow at ${d.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    })}`;
+  } else {
+    return d.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+};

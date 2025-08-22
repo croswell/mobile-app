@@ -1,37 +1,83 @@
 import { useMemo, useState, useRef, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, NativeScrollEvent, NativeSyntheticEvent, Animated } from "react-native";
+import { View, Text, ScrollView, NativeScrollEvent, NativeSyntheticEvent, Animated } from "react-native";
 import tw from "../../src/lib/tw";
 import { useData } from "../../src/state/data";
-import BetRow from "../../src/components/BetRow";
+import PlayCard from "../../src/components/PlayCard";
 import SegmentedTabs from "../../src/components/SegmentedTabs";
 import PlaysSummaryHeader from "../../src/components/PlaysSummaryHeader";
-import type { BetT } from "../../src/mocks/models";
+import type { BetT, ParsedBetT } from "../../src/mocks/models";
 
-type TabKey = "Active" | "Completed";
+type TabKey = "Live" | "Upcoming" | "Completed";
 
 export default function Plays() {
-  const { bets } = useData();
-  const [tab, setTab] = useState<TabKey>("Active");
+  const { posts } = useData();
+  const [tab, setTab] = useState<TabKey>("Live");
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   
   // Animation values - using only JS animations to avoid conflicts
   const heightAnim = useRef(new Animated.Value(160)).current; // Start with expanded height
 
-  const { active, completed } = useMemo(() => {
-    const active = bets
-      .filter(b => b.status === "active")
+  const { live, upcoming, completed } = useMemo(() => {
+    // Convert posts with parsed bets to a format we can use for plays
+    const parsedBets: Array<{ id: string; parsedBet: ParsedBetT; status: "live" | "upcoming" | "won" | "lost"; stake: number; startTime: Date }> = [];
+    
+    posts.forEach((post: any) => {
+      if (post.parsed && post.parsed.length > 0) {
+        post.parsed.forEach((parsedBet: ParsedBetT, index: number) => {
+          const startTime = new Date(parsedBet.eventTime);
+          const now = new Date();
+          
+          // Determine if this is a live game (started within the last 3 hours and not finished)
+          const isLive = startTime < now && startTime > new Date(now.getTime() - 3 * 60 * 60 * 1000);
+          
+          // Determine status based on time
+          let status: "live" | "upcoming" | "won" | "lost";
+          if (isLive) {
+            status = "live";
+          } else if (startTime > now) {
+            status = "upcoming";
+          } else {
+            // For completed games, randomly assign won or lost status
+            status = Math.random() > 0.5 ? "won" : "lost";
+          }
+          
+          parsedBets.push({
+            id: `${post.id}-${index}`,
+            parsedBet,
+            status,
+            stake: 5, // Use $5 stake to match our seed data structure
+            startTime
+          });
+        });
+      }
+    });
+
+    // Live bets - games currently in progress
+    const live = parsedBets
+      .filter(b => b.status === "live")
+      .sort((a,b)=> a.startTime.getTime() - b.startTime.getTime());
+    
+    // Upcoming bets - games that haven't started yet
+    const upcoming = parsedBets
+      .filter(b => b.status === "upcoming")
       .sort((a,b)=> a.startTime.getTime() - b.startTime.getTime());
 
-    const completed = bets
-      .filter(b => b.status !== "active")
+    // Completed bets - games that have finished (won or lost)
+    const completed = parsedBets
+      .filter(b => b.status === "won" || b.status === "lost")
       .sort((a,b)=> b.startTime.getTime() - a.startTime.getTime())
       .reverse(); // most recent first
 
-    return { active, completed };
-  }, [bets]);
+    return { live, upcoming, completed };
+  }, [posts]);
 
-  const data: BetT[] = tab === "Active" ? active : completed;
+  // Determine which data to show based on current tab
+  const data = tab === "Live" ? live : tab === "Upcoming" ? upcoming : completed;
+
+  // Calculate total at-risk amount from live and upcoming bets
+  const totalAtRisk = live.reduce((sum, bet) => sum + bet.stake, 0) + 
+                     upcoming.reduce((sum, bet) => sum + bet.stake, 0);
 
   // Animate header transition
   useEffect(() => {
@@ -64,14 +110,15 @@ export default function Plays() {
             overflow: 'hidden', // Hide content that goes beyond the animated height
           }}
         >
-          <PlaysSummaryHeader collapsed={isHeaderCollapsed} />
+          <PlaysSummaryHeader collapsed={isHeaderCollapsed} atRiskAmount={totalAtRisk} />
         </Animated.View>
         
         {/* Fixed segmented tabs */}
-        <View style={{ marginBottom: 16 }}>
+        <View style={tw`mb-4`}>
           <SegmentedTabs
             tabs={[
-              { key: "Active", label: "Active" },
+              { key: "Live", label: "Live", count: live.length },
+              { key: "Upcoming", label: "Upcoming", count: upcoming.length },
               { key: "Completed", label: "Completed" },
             ]}
             value={tab}
@@ -90,11 +137,11 @@ export default function Plays() {
         scrollEventThrottle={16} // 60fps scroll detection
       >
         {data.length > 0 ? (
-          data.map((bet) => <BetRow key={bet.id} bet={bet} />)
+          data.map((bet) => <PlayCard key={bet.id} bet={bet} />)
         ) : (
           <View style={tw`p-6`}>
             <Text style={tw`text-center text-neutral-400`}>
-              {tab === "Active" ? "No active plays yet." : "No completed plays yet."}
+              {tab === "Live" ? "No live plays yet." : tab === "Upcoming" ? "No upcoming plays yet." : "No completed plays yet."}
             </Text>
           </View>
         )}

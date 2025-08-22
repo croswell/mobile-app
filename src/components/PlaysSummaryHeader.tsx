@@ -5,30 +5,32 @@ import { financeApi } from "../lib/mockFinance";
 import type { LinkedAccount } from "../types/finance";
 import { useUI } from "../state/ui";
 import { BookOpen } from "lucide-react-native";
+import { useData } from "../state/data";
 
 type Props = {
   collapsed?: boolean;
+  atRiskAmount?: number;
 };
 
-export default function PlaysSummaryHeader({ collapsed = false }: Props) {
+export default function PlaysSummaryHeader({ collapsed = false, atRiskAmount = 0 }: Props) {
   const [bankroll, setBankroll] = useState(0);
-  const [atRisk, setAtRisk] = useState(0);
   const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
   const [lastSynced, setLastSynced] = useState<Date>( new Date());
   
   const { openBookDrawer } = useUI();
 
   const load = async () => {
-    const [accs, br, risk] = await Promise.all([
+    const [accs, br] = await Promise.all([
       financeApi.getAccounts(),
       financeApi.getTotalBankroll(),
-      financeApi.getAtRisk(),
     ]);
-    setAccounts(accs); setBankroll(br); setAtRisk(risk);
+    setAccounts(accs); setBankroll(br);
     setLastSynced(new Date());
   };
 
   useEffect(() => { load(); }, []);
+  
+
 
   if (collapsed) {
     return (
@@ -40,7 +42,7 @@ export default function PlaysSummaryHeader({ collapsed = false }: Props) {
           </View>
           <View>
             <Text style={tw`text-neutral-400 text-xs mb-0.5`}>At Risk</Text>
-            <Text style={tw`text-neutral-300 text-lg font-bold`}>${atRisk.toFixed(2)}</Text>
+            <Text style={tw`text-neutral-300 text-lg font-bold`}>${atRiskAmount.toFixed(2)}</Text>
           </View>
         </View>
       </View>
@@ -57,7 +59,7 @@ export default function PlaysSummaryHeader({ collapsed = false }: Props) {
         </View>
         <View>
           <Text style={tw`text-neutral-400 mb-1`}>At Risk</Text>
-          <Text style={tw`text-neutral-300 text-2xl font-bold`}>${atRisk.toFixed(2)}</Text>
+          <Text style={tw`text-neutral-300 text-2xl font-bold`}>${atRiskAmount.toFixed(2)}</Text>
         </View>
       </View>
 
@@ -76,7 +78,7 @@ export default function PlaysSummaryHeader({ collapsed = false }: Props) {
           </View>
         ))}
         
-        <View style={tw`ml-auto`}>
+        <View style={tw`ml-auto flex-row items-center`}>
           <Pressable
             style={tw`bg-neutral-800 border border-neutral-700 rounded-md px-3 py-2`}
             onPress={openBookDrawer}

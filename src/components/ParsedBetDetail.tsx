@@ -109,7 +109,22 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
     return { teams: '', cleanEvent: event };
   };
 
+  // Function to format moneyline bets to show which team you're betting on
+  const formatMoneylineBet = (event: string, market: string): string => {
+    if (market === "Moneyline") {
+      // For moneyline bets, show "Team ML" to make it clear who you're betting on
+      // Extract the first team name (before "vs")
+      const teamMatch = event.match(/^([^(]+?)\s+vs/);
+      if (teamMatch) {
+        const teamName = teamMatch[1].trim(); // "Bruins" from "Bruins vs Maple Leafs"
+        return `${teamName} ML`;
+      }
+    }
+    return event;
+  };
+
   const { teams, cleanEvent } = extractTeamAbbreviations(parsedBet.event);
+  const formattedEvent = formatMoneylineBet(cleanEvent, parsedBet.market);
   const validation = validateBetCompatibility(parsedBet);
 
   return (
@@ -135,7 +150,7 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
 
       {/* Bet details in text-lg font-bold */}
       <Text style={tw`text-lg font-bold text-white mb-4`}>
-        {cleanEvent}
+        {formattedEvent}
       </Text>
 
       {/* Validation warning if bet is not possible */}
