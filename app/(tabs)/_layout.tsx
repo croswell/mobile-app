@@ -1,5 +1,7 @@
 import { Tabs } from "expo-router";
 import { Home, Search, DollarSign, Gift } from "lucide-react-native";
+import { View } from "react-native";
+import tw from "../../lib/tw";
 
 export default function TabsLayout() {
   return (
@@ -36,7 +38,12 @@ export default function TabsLayout() {
         name="rewards" 
         options={{ 
           title: "Rewards",
-          tabBarIcon: ({ color, size }) => <Gift size={size} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <View style={tw`relative`}>
+              <Gift size={size} color={color} />
+              <View style={tw`absolute -top-1 -right-2 w-1.5 h-1.5 bg-rose-500 rounded-full`} />
+            </View>
+          )
         }} 
       />
       <Tabs.Screen 

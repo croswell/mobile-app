@@ -6,11 +6,15 @@ import type { LinkedAccount } from "../types/finance";
 import { useUI } from "../state/ui";
 import { BookOpen } from "lucide-react-native";
 
-export default function PlaysSummaryHeader() {
+type Props = {
+  collapsed?: boolean;
+};
+
+export default function PlaysSummaryHeader({ collapsed = false }: Props) {
   const [bankroll, setBankroll] = useState(0);
   const [atRisk, setAtRisk] = useState(0);
   const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
-  const [lastSynced, setLastSynced] = useState<Date>(new Date());
+  const [lastSynced, setLastSynced] = useState<Date>( new Date());
   
   const { openBookDrawer } = useUI();
 
@@ -25,6 +29,23 @@ export default function PlaysSummaryHeader() {
   };
 
   useEffect(() => { load(); }, []);
+
+  if (collapsed) {
+    return (
+      <View style={tw`bg-neutral-900 px-4 py-3 rounded-2xl border border-neutral-800 mb-4`}>
+        <View style={tw`flex-row justify-between items-center`}>
+          <View>
+            <Text style={tw`text-neutral-400 text-xs mb-0.5`}>Total Bankroll</Text>
+            <Text style={tw`text-brand text-lg font-bold`}>${bankroll.toFixed(2)}</Text>
+          </View>
+          <View>
+            <Text style={tw`text-neutral-400 text-xs mb-0.5`}>At Risk</Text>
+            <Text style={tw`text-neutral-300 text-lg font-bold`}>${atRisk.toFixed(2)}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={tw`bg-neutral-900 p-4 rounded-2xl border border-neutral-800 mb-6`}>

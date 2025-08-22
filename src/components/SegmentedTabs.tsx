@@ -21,6 +21,7 @@ export default function SegmentedTabs({
   const [layouts, setLayouts] = useState<Record<string, { x: number; width: number }>>({});
   const leftAnim = useRef(new Animated.Value(0)).current;
   const widthAnim = useRef(new Animated.Value(0)).current;
+  const firstRender = useRef(true);
 
   const selected = useMemo(() => tabs.find(t => t.key === value) ?? tabs[0], [tabs, value]);
 
@@ -33,19 +34,27 @@ export default function SegmentedTabs({
     const targetLeft = target.x - containerX;
     const targetWidth = target.width;
     
-    Animated.spring(leftAnim, {
-      toValue: targetLeft,
-      useNativeDriver: false, // animating layout properties (left/width)
-      damping: 25,
-      stiffness: 300,
-      mass: 0.8,
-    }).start();
+    if (firstRender.current) {
+      // Skip animation on first render
+      leftAnim.setValue(targetLeft);
+      widthAnim.setValue(targetWidth);
+      firstRender.current = false;
+    } else {
+      // Animate on subsequent changes
+      Animated.spring(leftAnim, {
+        toValue: targetLeft,
+        useNativeDriver: false, // Keep JS driver for consistency
+        damping: 25,
+        stiffness: 300,
+        mass: 0.8,
+      }).start();
 
-    Animated.timing(widthAnim, {
-      toValue: targetWidth,
-      duration: 150,
-      useNativeDriver: false,
-    }).start();
+      Animated.timing(widthAnim, {
+        toValue: targetWidth,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+    }
   }, [selected.key, layouts, containerX]);
 
   const onContainerLayout = (e: LayoutChangeEvent) => {

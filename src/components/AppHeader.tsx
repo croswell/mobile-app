@@ -1,11 +1,11 @@
 import { View, Image, Pressable, Text, Animated } from "react-native";
 import tw from "../lib/tw";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { UserCircle, ChevronDown } from "lucide-react-native";
+import { UserCircle, ChevronDown, MessageCircle } from "lucide-react-native";
 import { useUI } from "../state/ui";
 import { useFeedFilter } from "../state/feedFilter";
 import { useData } from "../state/data";
-import { usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 
 export default function AppHeader() {
@@ -14,6 +14,7 @@ export default function AppHeader() {
   const { selected } = useFeedFilter();
   const { partners } = useData();
   const pathname = usePathname();
+  const router = useRouter();
   const chevronRotation = useRef(new Animated.Value(0)).current;
 
   // Animate chevron rotation when drawer opens/closes
@@ -91,6 +92,15 @@ export default function AppHeader() {
         )}
         
         <View style={tw`ml-auto`} />
+        <Pressable
+          onPress={() => router.push("/chat")}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Messages"
+          style={tw`w-10 h-10 items-center justify-center rounded-full mr-3`}
+        >
+          <MessageCircle size={24} color="#737373" />
+        </Pressable>
         <Pressable
           onPress={toggleAccount}
           hitSlop={12}

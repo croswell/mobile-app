@@ -37,6 +37,14 @@ export default function RootLayout() {
               animation: 'slide_from_right'
             }} 
           />
+          <Stack.Screen 
+            name="chat" 
+            options={{ 
+              presentation: 'modal',
+              headerShown: false,
+              animation: 'slide_from_right'
+            }} 
+          />
         </Stack>
         <AccountDrawer />
         <ClubFilterDrawer />
