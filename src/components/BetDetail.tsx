@@ -1,8 +1,12 @@
-import { View, Text, Pressable } from "react-native";
-import tw from "../lib/tw";
+import React from 'react';
+import { View, Text, ScrollView, Pressable } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import tw from '../lib/tw';
 import type { BetT } from "../mocks/models";
 import { prettyOdds, whenReadable } from "../lib/format";
 import Logo from "./Logo";
+import GradientButton from './GradientButton';
 
 export default function BetDetail({ bet }: { bet: BetT }) {
   // Helper function to map book ID to display name
@@ -125,9 +129,14 @@ export default function BetDetail({ bet }: { bet: BetT }) {
       </View>
 
       {/* Big BET NOW button */}
-      <Pressable style={tw`w-full bg-brand rounded-lg py-4`}>
-        <Text style={tw`text-black text-center text-lg font-bold`}>BET NOW</Text>
-      </Pressable>
+      <GradientButton
+        onPress={() => {
+          // Handle bet action
+          console.log('Bet placed!');
+        }}
+        title="BET NOW"
+        style={tw`w-full`}
+      />
     </View>
   );
 }

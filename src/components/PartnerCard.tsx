@@ -17,6 +17,12 @@ export default function PartnerCard({ partner, onPress }: PartnerCardProps) {
         return require('../../assets/images/hammering-hank.jpg');
       case 'chilly-bets':
         return require('../../assets/images/chilly-bets.jpg');
+      case 'stosh-picks':
+        return require('../../assets/images/stosh-picks.png');
+      case 'the-moonshot':
+        return require('../../assets/images/the-moonshot.jpg');
+      case 'only-parlays':
+        return require('../../assets/images/only-parlays.png');
       default:
         return { uri: avatar };
     }
@@ -25,33 +31,30 @@ export default function PartnerCard({ partner, onPress }: PartnerCardProps) {
   return (
     <Pressable 
       onPress={onPress}
-      style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-4 mr-4 min-w-[200px]`}
+      style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-6 mr-4 min-w-[200px] active:bg-neutral-800`}
     >
       <View style={tw`items-center`}>
         {partner.avatar ? (
-          <Image 
-            source={getAvatarSource(partner.avatar)}
-            style={tw`w-16 h-16 rounded-full mb-3`} 
-          />
+          <View style={tw`w-16 h-16 rounded-xl bg-white mb-4 overflow-hidden`}>
+            <Image 
+              source={getAvatarSource(partner.avatar)}
+              style={tw`w-full h-full`} 
+              resizeMode="cover"
+            />
+          </View>
         ) : (
-          <View style={tw`w-16 h-16 rounded-full bg-neutral-800 mb-3 items-center justify-center`}>
+          <View style={tw`w-16 h-16 rounded-xl bg-neutral-800 mb-4 items-center justify-center`}>
             <Text style={tw`text-neutral-400 text-2xl`}>👤</Text>
           </View>
         )}
         
-        <Text style={tw`text-white font-semibold text-base text-center mb-2`}>
+        <Text style={tw`text-white font-semibold text-base text-center mb-3`}>
           {partner.name}
         </Text>
         
-        <Pressable 
-          style={tw`bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 w-full items-center`}
-          onPress={(e) => {
-            e.stopPropagation();
-            // Handle view profile action
-          }}
-        >
-          <Text style={tw`text-neutral-50 text-sm font-medium`}>View Profile</Text>
-        </Pressable>
+        <Text style={tw`text-neutral-400 text-sm text-center`}>
+          {Math.floor(Math.random() * 500) + 50} subscribers
+        </Text>
       </View>
     </Pressable>
   );

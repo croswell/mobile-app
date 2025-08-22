@@ -1,8 +1,11 @@
-import { View, Text, Pressable } from "react-native";
-import tw from "../lib/tw";
+import React from 'react';
+import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import tw from '../lib/tw';
 import type { BetT } from "../mocks/models";
 import { prettyOdds, whenReadable } from "../lib/format";
 import Logo from "./Logo";
+import GradientButton from './GradientButton';
 
 type Props = {
   game: string;
@@ -111,9 +114,14 @@ export default function GameRow({ game, startTime, league, bets }: Props) {
         )}
       </View>
 
-      <Pressable style={tw`mt-3 bg-brand rounded-lg px-3 py-2`}>
-        <Text style={tw`text-neutral-950 text-center text-sm font-medium`}>BET NOW</Text>
-      </Pressable>
+      <GradientButton
+        onPress={() => {
+          // Handle bet action
+          console.log('Bet placed on game!');
+        }}
+        title="BET NOW"
+        style={tw`mt-3`}
+      />
     </View>
   );
 }

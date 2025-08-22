@@ -12,8 +12,10 @@ export default function ClubFilterDrawer() {
   const { selected, setSelected } = useFeedFilter();
 
   // Options: default + followed partners first, then the rest
-  const followed = partners.filter(p => p.isSubscribed);
-  const others = partners.filter(p => !p.isSubscribed);
+  // Exclude the new recommended dubclubs from the filter
+  const recommendedClubNames = ['StoshPicks', 'TheMoonshot', 'OnlyParlays'];
+  const followed = partners.filter(p => p.isSubscribed && !recommendedClubNames.includes(p.name));
+  const others = partners.filter(p => !p.isSubscribed && !recommendedClubNames.includes(p.name));
   const options = ["All", ...followed.map(p=>p.name), ...others.map(p=>p.name)];
 
   return (

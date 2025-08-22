@@ -1,7 +1,10 @@
-import { View, Text, Pressable } from "react-native";
-import tw from "../lib/tw";
+import React from 'react';
+import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import tw from '../lib/tw';
 import type { BetT } from "../mocks/models";
 import { prettyOdds, whenReadable } from "../lib/format";
+import GradientButton from './GradientButton';
 import Logo from "./Logo";
 
 interface BetCardProps {
@@ -103,9 +106,14 @@ export default function BetCard({ bet, onPress }: BetCardProps) {
           </Text>
         </View>
         
-        <Pressable style={tw`bg-brand rounded-lg px-3 py-2`}>
-          <Text style={tw`text-neutral-950 text-sm font-medium`}>BET</Text>
-        </Pressable>
+        <GradientButton
+          onPress={() => {
+            // Handle bet action
+            console.log('Bet placed!');
+          }}
+          title="BET"
+          style={tw`px-3 py-2`}
+        />
       </View>
     </Pressable>
   );

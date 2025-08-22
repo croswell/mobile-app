@@ -1,6 +1,10 @@
-import { View, Text, Pressable } from "react-native";
-import tw from "../lib/tw";
-import type { ParsedBetT } from "../mocks/models";
+import React from 'react';
+import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import tw from '../../lib/tw';
+import type { ParsedBetT } from '../mocks/models';
+import { prettyOdds, whenReadable } from '../lib/format';
+import GradientButton from './GradientButton';
 import { formatBetRecommendation } from "../lib/bankroll";
 import { Wallet, AlertTriangle } from "lucide-react-native";
 import Logo from "./Logo";
@@ -211,14 +215,23 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
       })()}
 
       {/* Big BET NOW button - disabled if bet is not valid */}
-      <Pressable 
-        style={tw`w-full rounded-lg py-4 ${validation.isValid ? 'bg-brand' : 'bg-neutral-700'}`}
-        disabled={!validation.isValid}
-      >
-        <Text style={tw`text-center text-lg font-bold ${validation.isValid ? 'text-black' : 'text-neutral-400'}`}>
-          {validation.isValid ? 'BET NOW' : 'BET NOT AVAILABLE'}
-        </Text>
-      </Pressable>
+      {validation.isValid ? (
+        <GradientButton
+          onPress={() => {
+            // Handle bet action
+            console.log('Bet placed!');
+          }}
+          title="BET NOW"
+          style={tw`w-full`}
+        />
+      ) : (
+        <Pressable 
+          style={tw`w-full rounded-lg py-4 bg-neutral-700`}
+          disabled={true}
+        >
+          <Text style={tw`text-neutral-300 text-center text-lg font-bold`}>BET NOW</Text>
+        </Pressable>
+      )}
     </View>
   );
 }

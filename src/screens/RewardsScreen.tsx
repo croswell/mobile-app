@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, Pressable, Linking, RefreshControl } from "react-native";
-import { rewardsApi } from "../lib/mockRewards";
-import type { PromoOffer, RewardsState } from "../types/rewards";
-import tw from "../lib/tw";
-import SegmentedTabs from "../components/SegmentedTabs";
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, Pressable, Linking, RefreshControl } from 'react-native';
+import { rewardsApi } from '../lib/mockRewards';
+import type { PromoOffer, RewardsState } from '../types/rewards';
+import tw from '../lib/tw';
+import SegmentedTabs from '../components/SegmentedTabs';
+import GradientButton from '../components/GradientButton';
+import GradientProgressBar from '../components/GradientProgressBar';
 
 function Dollar({ value }: { value: number }) {
   return <Text style={tw`font-semibold`}>${value.toLocaleString()}</Text>;
@@ -20,17 +22,12 @@ function PromoItem({ item, onClaim }: { item: PromoOffer; onClaim: (id: string) 
         <Text style={tw`text-neutral-300 text-base mb-2`}>{item.title}</Text>
         <Text style={tw`text-neutral-400 text-sm leading-5`}>{item.description}</Text>
       </View>
-      <View style={tw`flex-row items-center justify-between`}>  
-        <Pressable
-          onPress={() => onClaim(item.id)}
-          disabled={!!item.claimed}
-          style={tw`flex-1 px-6 py-4 rounded-lg ${item.claimed ? "bg-neutral-700" : "bg-brand"}`}
-        >
-          <Text style={tw`font-bold text-center uppercase ${item.claimed ? "text-neutral-300" : "text-neutral-950"}`}>
-            {item.claimed ? "Claimed" : item.ctaLabel}
-          </Text>
-        </Pressable>
-      </View>
+      <GradientButton
+        onPress={() => onClaim(item.id)}
+        title={item.claimed ? "CLAIMED" : `CLAIM $${item.rewardValueUsd.toFixed(0)}`}
+        disabled={!!item.claimed}
+        style={tw`w-full`}
+      />
     </View>
   );
 }
@@ -80,19 +77,19 @@ export default function RewardsScreen() {
         />
       ) : (
         <View style={tw`bg-neutral-950 rounded-xl p-6 border border-neutral-800`}>
-          <Text style={tw`text-white text-2xl font-bold mb-3`}>Get<Text style={tw`font-extrabold text-brand`}>$25</Text> when a friend joins</Text>
+          <Text style={tw`text-white text-2xl font-bold mb-3`}>Get <Text style={tw`font-extrabold text-brand`}>$25</Text> when a friend joins</Text>
           <Text style={tw`text-neutral-300 mb-6 text-base leading-6`}>
             Share your code and get $25 per friend, or unlock larger bonuses with weekly streaks.
           </Text>
 
-          <View style={tw`bg-neutral-900 rounded-xl p-4 mb-6 border border-neutral-800`}>
-            <Text style={tw`text-neutral-300 text-sm mb-2`}>Your referral code</Text>
-            <View style={tw`flex-row items-center justify-between`}>
-              <Text style={tw`text-neutral-50 font-mono text-lg font-bold`}>{state.referral.code || "—"}</Text>
-              <Pressable onPress={() => Linking.openURL(state.referral.inviteUrl)} style={tw`bg-brand px-4 py-3 rounded-lg`}>
-                <Text style={tw`text-neutral-950 font-semibold`}>Share</Text>
-              </Pressable>
-            </View>
+          <View style={tw`bg-neutral-900 rounded-xl p-4 mb-6 border border-neutral-800 items-center`}>
+            <Text style={tw`text-neutral-300 text-sm mb-3`}>Your referral code</Text>
+            <Text style={tw`text-neutral-50 font-mono text-2xl font-bold text-center mb-4 uppercase`}>{state.referral.code || "—"}</Text>
+            <GradientButton
+              onPress={() => Linking.openURL(state.referral.inviteUrl)}
+              title="COPY"
+              style={tw`w-full uppercase`}
+            />
           </View>
 
           {/* Progress section */}
@@ -101,13 +98,13 @@ export default function RewardsScreen() {
               <Text style={tw`text-neutral-300 text-base`}>Weekly Progress</Text>
               <Text style={tw`text-white font-semibold text-lg`}>{state.referral.weeklyCompleted} / {state.referral.weeklyTarget}</Text>
             </View>
-            <View style={tw`h-3 bg-[#2a2a2a] rounded-full overflow-hidden mb-2`}>
-              <View style={[{ width: `${(state.referral.weeklyCompleted/state.referral.weeklyTarget)*100}%` }, tw`h-3 bg-brand`]}/>
-            </View>
-                          <Text style={tw`text-brand text-sm`}>Complete {state.referral.weeklyTarget} referrals this week for bonus rewards</Text>
+            <GradientProgressBar
+              progress={state.referral.weeklyCompleted / state.referral.weeklyTarget}
+              height={12}
+              style={tw`mb-2`}
+            />
+            <Text style={tw`text-brand text-sm`}>Complete {state.referral.weeklyTarget} referrals this week for bonus rewards</Text>
           </View>
-
-
         </View>
       )}
     </View>

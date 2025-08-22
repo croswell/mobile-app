@@ -5,7 +5,8 @@ import { useData } from "../../src/state/data";
 import PlayCard from "../../src/components/PlayCard";
 import SegmentedTabs from "../../src/components/SegmentedTabs";
 import PlaysSummaryHeader from "../../src/components/PlaysSummaryHeader";
-import type { BetT, ParsedBetT } from "../../src/mocks/models";
+
+import type { ParsedBetT } from "../../src/mocks/models";
 
 type TabKey = "Live" | "Upcoming" | "Completed";
 
@@ -19,8 +20,14 @@ export default function Plays() {
   const heightAnim = useRef(new Animated.Value(160)).current; // Start with expanded height
 
   const { live, upcoming, completed } = useMemo(() => {
-    // Convert posts with parsed bets to a format we can use for plays
-    const parsedBets: Array<{ id: string; parsedBet: ParsedBetT; status: "live" | "upcoming" | "won" | "lost"; stake: number; startTime: Date }> = [];
+    // Convert posts with parsed bets to PlayCard format
+    const parsedBets: Array<{
+      id: string;
+      parsedBet: ParsedBetT;
+      status: "live" | "upcoming" | "won" | "lost";
+      stake: number;
+      startTime: Date;
+    }> = [];
     
     posts.forEach((post: any) => {
       if (post.parsed && post.parsed.length > 0) {
@@ -31,24 +38,26 @@ export default function Plays() {
           // Determine if this is a live game (started within the last 3 hours and not finished)
           const isLive = startTime < now && startTime > new Date(now.getTime() - 3 * 60 * 60 * 1000);
           
-          // Determine status based on time
+          // Determine status based on time - map to PlayCard status values
           let status: "live" | "upcoming" | "won" | "lost";
           if (isLive) {
             status = "live";
           } else if (startTime > now) {
             status = "upcoming";
           } else {
-            // For completed games, randomly assign won or lost status
-            status = Math.random() > 0.5 ? "won" : "lost";
+            status = "won"; // Default to won for completed games
           }
           
-          parsedBets.push({
+          // Convert to PlayCard format
+          const betData = {
             id: `${post.id}-${index}`,
-            parsedBet,
-            status,
+            parsedBet: parsedBet,
+            status: status,
             stake: 5, // Use $5 stake to match our seed data structure
-            startTime
-          });
+            startTime: startTime
+          };
+          
+          parsedBets.push(betData);
         });
       }
     });
@@ -56,17 +65,17 @@ export default function Plays() {
     // Live bets - games currently in progress
     const live = parsedBets
       .filter(b => b.status === "live")
-      .sort((a,b)=> a.startTime.getTime() - b.startTime.getTime());
+      .sort((a,b)=> new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     
     // Upcoming bets - games that haven't started yet
     const upcoming = parsedBets
       .filter(b => b.status === "upcoming")
-      .sort((a,b)=> a.startTime.getTime() - b.startTime.getTime());
+      .sort((a,b)=> new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-    // Completed bets - games that have finished (won or lost)
+    // Completed bets - games that have finished
     const completed = parsedBets
       .filter(b => b.status === "won" || b.status === "lost")
-      .sort((a,b)=> b.startTime.getTime() - a.startTime.getTime())
+      .sort((a,b)=> new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
       .reverse(); // most recent first
 
     return { live, upcoming, completed };
@@ -76,8 +85,7 @@ export default function Plays() {
   const data = tab === "Live" ? live : tab === "Upcoming" ? upcoming : completed;
 
   // Calculate total at-risk amount from live and upcoming bets
-  const totalAtRisk = live.reduce((sum, bet) => sum + bet.stake, 0) + 
-                     upcoming.reduce((sum, bet) => sum + bet.stake, 0);
+  const totalAtRisk = live.length * 5 + upcoming.length * 5; // Assuming $5 per bet
 
   // Animate header transition
   useEffect(() => {
@@ -97,6 +105,11 @@ export default function Plays() {
     if (shouldCollapse !== isHeaderCollapsed) {
       setIsHeaderCollapsed(shouldCollapse);
     }
+  };
+
+  const handlePlayPress = (bet: any) => {
+    // Handle play press - could navigate to bet details
+    console.log('Play pressed:', bet);
   };
 
   return (
@@ -137,7 +150,13 @@ export default function Plays() {
         scrollEventThrottle={16} // 60fps scroll detection
       >
         {data.length > 0 ? (
-          data.map((bet) => <PlayCard key={bet.id} bet={bet} />)
+          data.map((bet) => (
+            <PlayCard
+              key={bet.id}
+              bet={bet}
+              onPress={() => handlePlayPress(bet)}
+            />
+          ))
         ) : (
           <View style={tw`p-6`}>
             <Text style={tw`text-center text-neutral-400`}>

@@ -91,7 +91,7 @@ export default function Discover() {
               style={tw`${league === "ALL" ? "bg-neutral-100 border-neutral-100" : "bg-neutral-900 border-neutral-700"} border rounded-full px-4 py-2 flex-row items-center`}
             >
               <Compass size={16} color={league === "ALL" ? "#0a0a0a" : "#9ca3af"} style={tw`mr-2`} />
-              <Text style={tw`${league === "ALL" ? "text-neutral-950" : "text-neutral-300"} text-sm`}>Explore</Text>
+              <Text style={tw`${league === "ALL" ? "text-neutral-950" : "text-neutral-300"} text-sm font-semibold`}>Explore</Text>
             </Pressable>
             
             {/* Other league chips */}
@@ -103,7 +103,7 @@ export default function Discover() {
                   onPress={() => setLeague(k)}
                   style={tw`${on ? "bg-neutral-100 border-neutral-100" : "bg-neutral-900 border-neutral-700"} border rounded-full px-4 py-2`}
                 >
-                  <Text style={tw`${on ? "text-neutral-950" : "text-neutral-300"} text-sm`}>{k}</Text>
+                  <Text style={tw`${on ? "text-neutral-950" : "text-neutral-300"} text-sm font-semibold`}>{k}</Text>
                 </Pressable>
               );
             })}

@@ -13,6 +13,16 @@ export const Partner = z.object({
   isSubscribed: z.boolean(),
 });
 
+// New type for live bet progress tracking
+export const LiveBetProgress = z.object({
+  currentScore: z.string(), // e.g., "24-18", "3-1", "14-7"
+  timeRemaining: z.string(), // e.g., "Q3 8:45", "Bottom 7th", "2nd Half 23:14"
+  progressPercentage: z.number(), // 0-100, represents game completion
+  keyStats: z.record(z.string(), z.any()).optional(), // e.g., { "rebounds": 8, "assists": 12, "points": 24 }
+  lastUpdate: z.date(),
+});
+
+// Enhanced bet structure with live progress tracking
 export const Bet = z.object({
   id: z.string(),
   league: z.enum(["NFL","NBA","MLB","NHL","NCAAF","NCAAB"]),
@@ -26,9 +36,10 @@ export const Bet = z.object({
   status: z.enum(["active","live","won","lost","void"]),
   stake: z.number().optional(),
   gameState: z.enum(["scheduled","in_progress","final"]).optional(), // New field for game state
+  liveProgress: LiveBetProgress.optional(), // New field for live bet progress
 });
 
-// New parsed bet structure for posts
+// New parsed bet structure for posts with enhanced live tracking
 export const ParsedBet = z.object({
   league: z.string(),        // NBA, NFL, MLB, NCAAB, etc.
   event: z.string(),         // Matchup or player-specific event
@@ -37,6 +48,8 @@ export const ParsedBet = z.object({
   odds: z.number(),          // actual odds, e.g., -110, +200
   book: z.string(),          // DraftKings, FanDuel, PrizePicks, Underdog
   eventTime: z.string(),     // ISO string in the near future
+  betType: z.enum(["moneyline", "spread", "total", "player_prop", "parlay"]).optional(), // New field for bet type
+  liveProgress: LiveBetProgress.optional(), // New field for live bet progress
 });
 
 // Add attachment type

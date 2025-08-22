@@ -51,22 +51,23 @@ export function makeSeed(): {
       avatar: "chilly-bets",
       isSubscribed: true,
     },
+
     {
       id: faker.string.uuid(),
-      name: "EliteOdds",
-      avatar: undefined,
+      name: "StoshPicks",
+      avatar: "stosh-picks",
       isSubscribed: false,
     },
     {
       id: faker.string.uuid(),
-      name: "VegasInsider",
-      avatar: undefined,
+      name: "TheMoonshot",
+      avatar: "the-moonshot",
       isSubscribed: false,
     },
     {
       id: faker.string.uuid(),
-      name: "SharpShooter",
-      avatar: undefined,
+      name: "OnlyParlays",
+      avatar: "only-parlays",
       isSubscribed: false,
     }
   ];
@@ -95,6 +96,7 @@ export function makeSeed(): {
       // Moneyline bets (only traditional sportsbooks)
       {
         market: "Moneyline",
+        betType: "moneyline" as const,
         event: faker.helpers.arrayElement([
           "Lakers vs Warriors (LAL vs GSW)",
           "Cowboys vs Eagles (DAL vs PHI)", 
@@ -113,6 +115,7 @@ export function makeSeed(): {
       // Spread bets (only traditional sportsbooks)
       {
         market: "Spread",
+        betType: "spread" as const,
         event: faker.helpers.arrayElement([
           "Lakers -2.5 vs Suns (LAL vs PHX)",
           "Cowboys +3.5 @ Eagles (DAL vs PHI)",
@@ -129,6 +132,7 @@ export function makeSeed(): {
       // Single player props (only traditional sportsbooks)
       {
         market: "Player Prop",
+        betType: "player_prop" as const,
         event: faker.helpers.arrayElement([
           "LeBron James Over 24.5 Points (LAL vs GSW)",
           "Patrick Mahomes Over 275.5 Passing Yards (KC vs BUF)",
@@ -145,6 +149,7 @@ export function makeSeed(): {
       // Multi-leg player prop parlays (PrizePicks, Underdog, Sleeper)
       {
         market: "Player Prop Parlay",
+        betType: "parlay" as const,
         event: faker.helpers.arrayElement([
           "LeBron Over 24.5 Points + Curry Over 3.5 Threes (LAL vs GSW)",
           "Mahomes Over 275.5 Yards + Kelce Over 6.5 Receptions (KC vs BUF)",
@@ -161,6 +166,7 @@ export function makeSeed(): {
       // Straight bets (totals, etc.) - only traditional sportsbooks
       {
         market: "Total",
+        betType: "total" as const,
         event: faker.helpers.arrayElement([
           "Lakers vs Warriors Over 224.5 (LAL vs GSW)",
           "Cowboys vs Eagles Under 48.5 (DAL vs PHI)",
@@ -238,6 +244,63 @@ export function makeSeed(): {
     
 
 
+    // Create live progress data for live bets
+    let liveProgress = undefined;
+    if (timeType === 'live') {
+      const progressPercentage = faker.number.int({ min: 25, max: 75 });
+      const currentScore = selectedType.league === "NBA" ? 
+        `${faker.number.int({ min: 80, max: 120 })}-${faker.number.int({ min: 80, max: 120 })}` :
+        selectedType.league === "NFL" ? 
+        `${faker.number.int({ min: 7, max: 35 })}-${faker.number.int({ min: 7, max: 35 })}` :
+        selectedType.league === "MLB" ? 
+        `${faker.number.int({ min: 1, max: 8 })}-${faker.number.int({ min: 1, max: 8 })}` :
+        `${faker.number.int({ min: 2, max: 6 })}-${faker.number.int({ min: 2, max: 6 })}`;
+      
+      const timeRemaining = selectedType.league === "NBA" ? 
+        `Q${faker.number.int({ min: 2, max: 4 })} ${faker.number.int({ min: 1, max: 12 })}:${faker.number.int({ min: 0, max: 59 }).toString().padStart(2, '0')}` :
+        selectedType.league === "NFL" ? 
+        `Q${faker.number.int({ min: 2, max: 4 })} ${faker.number.int({ min: 1, max: 15 })}:${faker.number.int({ min: 0, max: 59 }).toString().padStart(2, '0')}` :
+        selectedType.league === "MLB" ? 
+        `${faker.helpers.arrayElement(['Top', 'Bottom'])} ${faker.number.int({ min: 6, max: 9 })}th` :
+        `${faker.number.int({ min: 1, max: 3 })}rd Period ${faker.number.int({ min: 1, max: 20 })}:${faker.number.int({ min: 0, max: 59 }).toString().padStart(2, '0')}`;
+      
+      // Add key stats based on bet type - for live bets, show realistic progress (less than targets)
+      let keyStats = {};
+      if (selectedType.betType === "player_prop" || selectedType.betType === "parlay") {
+        if (selectedType.league === "NBA") {
+          // For live bets, show realistic progress that's less than typical targets
+          keyStats = {
+            points: faker.number.int({ min: 8, max: 18 }), // Most targets are 20+, so this shows progress
+            rebounds: faker.number.int({ min: 2, max: 6 }), // Most targets are 8+, so this shows progress
+            assists: faker.number.int({ min: 1, max: 4 }), // Most targets are 5+, so this shows progress
+            threes: faker.number.int({ min: 1, max: 2 }) // Most targets are 3+, so this shows progress
+          };
+        } else if (selectedType.league === "NFL") {
+          keyStats = {
+            passingYards: faker.number.int({ min: 120, max: 220 }), // Most targets are 250+, so this shows progress
+            touchdowns: faker.number.int({ min: 1, max: 2 }), // Most targets are 2.5+, so this shows progress
+            receptions: faker.number.int({ min: 2, max: 5 }), // Most targets are 6.5+, so this shows progress
+            receivingYards: faker.number.int({ min: 25, max: 65 }) // Most targets are 75+, so this shows progress
+          };
+        } else if (selectedType.league === "MLB") {
+          keyStats = {
+            homeRuns: faker.number.int({ min: 0, max: 1 }), // Most targets are 0.5+, so this shows progress
+            strikeouts: faker.number.int({ min: 2, max: 5 }), // Most targets are 6.5+, so this shows progress
+            hits: faker.number.int({ min: 1, max: 2 }), // Most targets are 2.5+, so this shows progress
+            rbis: faker.number.int({ min: 0, max: 1 }) // Most targets are 1.5+, so this shows progress
+          };
+        }
+      }
+      
+      liveProgress = {
+        currentScore,
+        timeRemaining,
+        progressPercentage,
+        keyStats,
+        lastUpdate: new Date()
+      };
+    }
+    
     return {
       league: determineLeague(selectedType.event, selectedType.market),
       event: selectedType.event,
@@ -245,12 +308,96 @@ export function makeSeed(): {
       line: selectedType.line,
       odds: selectedType.odds,
       book,
-      eventTime
+      eventTime,
+      betType: selectedType.betType,
+      liveProgress
     };
+  };
+
+  // Create specific examples of live bets with different types for demonstration
+  const createSpecificLiveBets = (): ParsedBetT[] => {
+    const now = new Date();
+    const liveStartTime = new Date(now.getTime() - 1.5 * 60 * 60 * 1000); // 1.5 hours ago
+    
+    return [
+      // Example 1: Moneyline bet (NBA)
+      {
+        league: "NBA",
+        event: "Lakers vs Warriors (LAL vs GSW)",
+        market: "Moneyline",
+        line: "+120",
+        odds: +120,
+        book: "DraftKings",
+        eventTime: liveStartTime.toISOString(),
+        betType: "moneyline",
+        liveProgress: {
+          currentScore: "98-92",
+          timeRemaining: "Q4 8:45",
+          progressPercentage: 65,
+          lastUpdate: new Date()
+        }
+      },
+      // Example 2: Over/Under bet (NFL)
+      {
+        league: "NFL",
+        event: "Cowboys vs Eagles Total (DAL vs PHI)",
+        market: "Total",
+        line: "Over 48.5",
+        odds: -110,
+        book: "FanDuel",
+        eventTime: liveStartTime.toISOString(),
+        betType: "total",
+        liveProgress: {
+          currentScore: "21-17",
+          timeRemaining: "Q3 12:30",
+          progressPercentage: 45,
+          lastUpdate: new Date()
+        }
+      },
+      // Example 3: Player Prop 2-man parlay (NBA)
+      {
+        league: "NBA",
+        event: "LeBron Over 24.5 Points + Curry Over 3.5 Threes (LAL vs GSW)",
+        market: "Player Prop Parlay",
+        line: "2-Leg",
+        odds: +300,
+        book: "PrizePicks",
+        eventTime: liveStartTime.toISOString(),
+        betType: "parlay",
+        liveProgress: {
+          currentScore: "98-92",
+          timeRemaining: "Q4 8:45",
+          progressPercentage: 65,
+          keyStats: {
+            // Separate stats for each leg of the parlay
+            "BookerPoints": 18, // Booker Over 24.5 Points - current: 18
+            "DurantPoints": 22, // Durant Over 26.5 Points - current: 22  
+            "BookerAssists": 3, // Booker Over 4.5 Assists - current: 3
+          },
+          lastUpdate: new Date()
+        }
+      }
+    ];
   };
 
   // Create posts with realistic parsed bet data
   const posts: PostT[] = [];
+  
+  // Add specific live bet examples for demonstration
+  const specificLiveBets = createSpecificLiveBets();
+  specificLiveBets.forEach((bet, index) => {
+    posts.push({
+      id: `live-example-${index}`,
+      partnerId: partners[0].id, // Use first partner
+      createdAt: new Date(),
+      extraction: "parsed",
+      text: `Live bet example ${index + 1}: ${bet.market} on ${bet.event}`,
+      betIds: [],
+      parsed: [bet],
+      views: faker.number.int({ min: 50, max: 200 }),
+      tails: faker.number.int({ min: 10, max: 50 })
+    });
+  });
   
   // Create 12 posts with different bet types (mix of parsed and unparsed, favoring parsed)
   for (let i = 0; i < 12; i++) {
