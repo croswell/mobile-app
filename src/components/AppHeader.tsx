@@ -27,7 +27,7 @@ export default function AppHeader() {
   });
 
   return (
-    <View style={[tw`bg-neutral-950`, { paddingTop: top }]}>
+    <View style={[tw`bg-neutral-950 border-b border-neutral-800`, { paddingTop: top }]}>
       <View style={tw`flex-row items-center px-4 pb-6`}>
         <Image
           source={require("../../assets/images/ios-app-icon.png")}

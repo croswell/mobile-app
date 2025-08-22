@@ -23,14 +23,12 @@ export default function Home() {
 
   return (
     <View style={tw`flex-1 bg-neutral-950`}>
-      <View style={tw`p-4 pt-0`}>
-        <FlatList
-          data={filtered}
-          keyExtractor={(p) => p.id}
-          renderItem={({ item }) => <PostCard post={item} />}
-          contentContainerStyle={tw`pb-8`}
-        />
-      </View>
+      <FlatList
+        data={filtered}
+        keyExtractor={(p) => p.id}
+        renderItem={({ item }) => <PostCard post={item} />}
+        contentContainerStyle={tw`pb-8`}
+      />
     </View>
   );
 }
