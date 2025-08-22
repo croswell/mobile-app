@@ -63,14 +63,117 @@ export default function Plays() {
     });
 
     // Live bets - games currently in progress
-    const live = parsedBets
+    let live = parsedBets
       .filter(b => b.status === "live")
       .sort((a,b)=> new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
     
+    // Ensure first 3 live plays are player prop parlays
+    const playerPropParlays = live.filter(b => b.parsedBet.betType === "parlay");
+    const otherLiveBets = live.filter(b => b.parsedBet.betType !== "parlay");
+    
+    // Create 3 player prop parlay bets if we don't have enough
+    const neededParlays = 3 - playerPropParlays.length;
+    if (neededParlays > 0) {
+      const additionalParlays = [];
+      for (let i = 0; i < neededParlays; i++) {
+        const parlayBet = {
+          id: `generated-parlay-${i}`,
+          parsedBet: {
+            league: "NBA",
+            event: "LeBron Over 24.5 Points + Curry Over 3.5 Threes (LAL vs GSW)",
+            market: "Player Prop Parlay",
+            line: "2-Leg",
+            odds: 200,
+            book: "PrizePicks",
+            eventTime: new Date(Date.now() - (i + 1) * 60 * 60 * 1000).toISOString(),
+            betType: "parlay" as const,
+            liveProgress: {
+              currentScore: "85-78",
+              timeRemaining: "Q3 8:45",
+              progressPercentage: 65,
+              keyStats: { points: 18, threes: 2 },
+              lastUpdate: new Date()
+            }
+          },
+          status: "live" as const,
+          stake: 5,
+          startTime: new Date(Date.now() - (i + 1) * 60 * 60 * 1000)
+        };
+        additionalParlays.push(parlayBet);
+      }
+      
+      live = [...additionalParlays, ...playerPropParlays, ...otherLiveBets];
+    } else {
+      live = [...playerPropParlays.slice(0, 3), ...otherLiveBets, ...playerPropParlays.slice(3)];
+    }
+    
+    // Take first 3 live bets and set them to $5 each
+    live = live.slice(0, 3).map(bet => ({
+      ...bet,
+      stake: 5
+    }));
+    
     // Upcoming bets - games that haven't started yet
-    const upcoming = parsedBets
+    let upcoming = parsedBets
       .filter(b => b.status === "upcoming")
-      .sort((a,b)=> new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+      .sort((a,b)=> new Date(b.startTime).getTime() - new Date(b.startTime).getTime());
+    
+    // Set upcoming bets to $5 each to reach $25 total
+    // Live bets: 3 × $5 = $15, so we need $10 more from upcoming
+    if (upcoming.length === 0) {
+      // No upcoming bets exist, create 2 at $5 each to reach $25 total
+      upcoming = [
+        {
+          id: "generated-upcoming-1",
+          parsedBet: {
+            league: "NBA",
+            event: "Lakers -2.5 vs Warriors (LAL vs GSW)",
+            market: "Spread",
+            line: "-2.5",
+            odds: -110,
+            book: "DraftKings",
+            eventTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
+            betType: "spread"
+          },
+          status: "upcoming",
+          stake: 5,
+          startTime: new Date(Date.now() + 2 * 60 * 60 * 1000)
+        },
+        {
+          id: "generated-upcoming-2",
+          parsedBet: {
+            league: "NFL",
+            event: "Cowboys +3.5 @ Eagles (DAL vs PHI)",
+            market: "Spread",
+            line: "+3.5",
+            odds: -110,
+            book: "FanDuel",
+            eventTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(), // 3 hours from now
+            betType: "spread"
+          },
+          status: "upcoming",
+          stake: 5,
+          startTime: new Date(Date.now() + 3 * 60 * 60 * 1000)
+        }
+      ];
+    } else if (upcoming.length === 1) {
+      // 1 upcoming bet gets $10
+      upcoming = upcoming.map(bet => ({ ...bet, stake: 10 }));
+    } else if (upcoming.length === 2) {
+      // 2 upcoming bets get $5 each
+      upcoming = upcoming.map(bet => ({ ...bet, stake: 5 }));
+    } else {
+      // More than 2 upcoming bets: take first 2 at $5 each
+      upcoming = upcoming.slice(0, 2).map(bet => ({ ...bet, stake: 5 }));
+    }
+    
+    // Debug logging
+    const liveTotal = live.reduce((sum, bet) => sum + bet.stake, 0);
+    const upcomingTotal = upcoming.reduce((sum, bet) => sum + bet.stake, 0);
+    console.log('Plays Logic:');
+    console.log(`Live: ${live.length} bets × $5 = $${liveTotal}`);
+    console.log(`Upcoming: ${upcoming.length} bets = $${upcomingTotal}`);
+    console.log(`Total at-risk: $${liveTotal + upcomingTotal}`);
 
     // Completed bets - games that have finished
     const completed = parsedBets
@@ -85,7 +188,8 @@ export default function Plays() {
   const data = tab === "Live" ? live : tab === "Upcoming" ? upcoming : completed;
 
   // Calculate total at-risk amount from live and upcoming bets
-  const totalAtRisk = live.length * 5 + upcoming.length * 5; // Assuming $5 per bet
+  const totalAtRisk = live.reduce((sum, bet) => sum + bet.stake, 0) + 
+                     upcoming.reduce((sum, bet) => sum + bet.stake, 0);
 
   // Animate header transition
   useEffect(() => {
