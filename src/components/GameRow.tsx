@@ -2,6 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import tw from "../lib/tw";
 import type { BetT } from "../mocks/models";
 import { prettyOdds, when } from "../lib/format";
+import Logo from "./Logo";
 
 type Props = {
   game: string;
@@ -24,9 +25,26 @@ function bestByMarket(bets: BetT[], market: string) {
 }
 
 export default function GameRow({ game, startTime, league, bets }: Props) {
+  // Helper function to map book ID to display name
+  const getBookDisplayName = (bookId: string) => {
+    const bookMap: Record<string, string> = {
+      'dk': 'DraftKings',
+      'fd': 'FanDuel',
+      'pp': 'PrizePicks',
+      'ud': 'Underdog',
+      'sl': 'Sleeper',
+      'mgm': 'BetMGM'
+    };
+    return bookMap[bookId] || bookId;
+  };
+
   const ml = bestByMarket(bets, "Moneyline");
   const sp = bestByMarket(bets, "Spread");
   const tot = bestByMarket(bets, "Total");
+  
+  // Get player props and parlay bets
+  const playerProps = bets.filter(b => b.market.toLowerCase().includes('player'));
+  const parlayBets = bets.filter(b => b.market.toLowerCase() === 'parlay');
 
   return (
     <View style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-4`}>
@@ -36,32 +54,65 @@ export default function GameRow({ game, startTime, league, bets }: Props) {
       </View>
       <Text style={tw`text-xs text-neutral-400 mb-3`}>{league}</Text>
 
-      <View style={tw`flex-row gap-2`}>
+      <View style={tw`flex-row gap-2 flex-wrap`}>
         {ml && (
           <View style={tw`border border-neutral-700 rounded-lg px-3 py-2 bg-neutral-800`}>
             <Text style={tw`text-xs text-neutral-400 mb-1`}>Moneyline</Text>
             <Text style={tw`font-semibold text-neutral-100`}>{prettyOdds(ml.odds)}</Text>
-            <Text style={tw`text-xs text-neutral-400`}>Book: {ml.bookId}</Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Logo book={getBookDisplayName(ml.bookId)} size="small" />
+              <Text style={tw`text-xs text-neutral-400 ml-2`}>{getBookDisplayName(ml.bookId)}</Text>
+            </View>
           </View>
         )}
         {sp && (
           <View style={tw`border border-neutral-700 rounded-lg px-3 py-2 bg-neutral-800`}>
             <Text style={tw`text-xs text-neutral-400 mb-1`}>Spread</Text>
             <Text style={tw`font-semibold text-neutral-100`}>{sp.line} • {prettyOdds(sp.odds)}</Text>
-            <Text style={tw`text-xs text-neutral-400`}>Book: {sp.bookId}</Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Logo book={getBookDisplayName(sp.bookId)} size="small" />
+              <Text style={tw`text-xs text-neutral-400 ml-2`}>{getBookDisplayName(sp.bookId)}</Text>
+            </View>
           </View>
         )}
         {tot && (
           <View style={tw`border border-neutral-700 rounded-lg px-3 py-2 bg-neutral-800`}>
             <Text style={tw`text-xs text-neutral-400 mb-1`}>Total</Text>
             <Text style={tw`font-semibold text-neutral-100`}>{tot.line} • {prettyOdds(tot.odds)}</Text>
-            <Text style={tw`text-xs text-neutral-400`}>Book: {tot.bookId}</Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Logo book={getBookDisplayName(tot.bookId)} size="small" />
+              <Text style={tw`text-xs text-neutral-400 ml-2`}>{getBookDisplayName(tot.bookId)}</Text>
+            </View>
+          </View>
+        )}
+        
+        {/* Show first player prop if available */}
+        {playerProps.length > 0 && (
+          <View style={tw`border border-blue-700 rounded-lg px-3 py-2 bg-blue-900`}>
+            <Text style={tw`text-xs text-blue-300 mb-1`}>Player Prop</Text>
+            <Text style={tw`font-semibold text-neutral-100`}>{playerProps[0].market} {playerProps[0].line}</Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Logo book={getBookDisplayName(playerProps[0].bookId)} size="small" />
+              <Text style={tw`text-xs text-blue-300 ml-2`}>{getBookDisplayName(playerProps[0].bookId)}</Text>
+            </View>
+          </View>
+        )}
+        
+        {/* Show first parlay if available */}
+        {parlayBets.length > 0 && (
+          <View style={tw`border border-purple-700 rounded-lg px-3 py-2 bg-purple-900`}>
+            <Text style={tw`text-xs text-purple-300 mb-1`}>Parlay</Text>
+            <Text style={tw`font-semibold text-neutral-100`}>{parlayBets[0].line} • {prettyOdds(parlayBets[0].odds)}</Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Logo book={getBookDisplayName(parlayBets[0].bookId)} size="small" />
+              <Text style={tw`text-xs text-purple-300 ml-2`}>{getBookDisplayName(parlayBets[0].bookId)}</Text>
+            </View>
           </View>
         )}
       </View>
 
       <Pressable style={tw`mt-3 bg-brand rounded-lg px-3 py-2`}>
-        <Text style={tw`text-neutral-950 text-center text-sm font-medium`}>Bet Now</Text>
+        <Text style={tw`text-neutral-950 text-center text-sm font-medium`}>BET NOW</Text>
       </Pressable>
     </View>
   );

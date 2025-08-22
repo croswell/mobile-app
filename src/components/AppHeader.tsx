@@ -47,9 +47,9 @@ export default function AppHeader() {
         >
           <Text
             numberOfLines={1}
-            style={tw`text-white text-2xl font-bold mr-1`}
+            style={tw`text-white text-xl font-bold mr-1`}
           >
-            {selected === "All" ? "DubClubs" : selected}
+            {selected === "All" ? "All DubClubs" : selected}
           </Text>
           <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
             <ChevronDown size={24} color="white" />

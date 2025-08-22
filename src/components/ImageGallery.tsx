@@ -249,7 +249,7 @@ export default function ImageGallery({ images, onImagePress }: ImageGalleryProps
   const additionalImageSize = firstTwoWidth; // Same size as first two
 
   return (
-    <View style={tw`mb-4`}>
+    <View style={tw`mb-6`}>
       <ScrollView
         ref={scrollViewRef}
         horizontal

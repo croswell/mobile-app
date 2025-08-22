@@ -4,6 +4,7 @@ import tw from "../src/lib/tw";
 import { useData } from "../src/state/data";
 import { when } from "../src/lib/format";
 import BetDetail from "../src/components/BetDetail";
+import ParsedBetDetail from "../src/components/ParsedBetDetail";
 import { postBets } from "../src/lib/post";
 import { ArrowLeft } from "lucide-react-native";
 import ImageGallery from "../src/components/ImageGallery";
@@ -109,7 +110,18 @@ export default function PostModal() {
         )}
 
         {/* All bets */}
-        {(post.betIds?.length ?? 0) > 0 && (
+        {post.parsed && post.parsed.length > 0 ? (
+          <View style={tw`mt-4`}>
+            <Text style={tw`text-white font-semibold text-lg mb-3`}>
+              Parsed Bet
+            </Text>
+            {post.parsed.map((parsedBet, index) => (
+              <View key={index} style={tw`mb-3`}>
+                <ParsedBetDetail parsedBet={parsedBet} />
+              </View>
+            ))}
+          </View>
+        ) : (post.betIds?.length ?? 0) > 0 ? (
           <View style={tw`mt-4`}>
             <Text style={tw`text-white font-semibold text-lg mb-3`}>
               Bets ({post.betIds?.length})
@@ -120,7 +132,7 @@ export default function PostModal() {
               </View>
             ))}
           </View>
-        )}
+        ) : null}
       </ScrollView>
     </View>
   );

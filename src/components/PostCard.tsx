@@ -7,6 +7,7 @@ import { useEmojiPicker } from "../state/emojiPicker";
 import type { PostT } from "../mocks/models";
 import { when } from "../lib/format";
 import BetDetail from "./BetDetail";
+import ParsedBetDetail from "./ParsedBetDetail";
 import { postBets, ctaLabelForPost, hasImages } from "../lib/post";
 import { router } from "expo-router";
 import ImageGallery from "./ImageGallery";
@@ -152,7 +153,7 @@ export default function PostCard({ post }: { post: PostT }) {
     <>
       <View style={tw`bg-neutral-950 py-6 mb-0 border-b border-neutral-800`}>
       {/* Header: Partner logo + name on left, timestamp on right */}
-      <View style={tw`flex-row items-center justify-between mb-3 px-4`}>
+      <View style={tw`flex-row items-center justify-between mb-6 px-4`}>
         <View style={tw`flex-row items-center`}>
           {partner?.avatar ? (
             <Image 
@@ -164,13 +165,13 @@ export default function PostCard({ post }: { post: PostT }) {
             {partner?.name ?? "Partner"}
           </Text>
         </View>
-        <Text style={tw`text-xs text-gray-400`}>{when(post.createdAt)}</Text>
+        <Text style={tw`text-xs text-neutral-400`}>{when(post.createdAt)}</Text>
       </View>
 
       {/* Post text with show more logic */}
       {!!post.text && (
-        <View style={tw`px-4`}>
-          <Text style={tw`text-gray-100 text-base leading-6 mb-3`} numberOfLines={!isExpanded && post.text.length > MAX_CHARS ? 3 : undefined}>
+        <View style={tw`px-4 mb-4`}>
+          <Text style={tw`text-neutral-100 text-base leading-6 mb-3`} numberOfLines={!isExpanded && post.text.length > MAX_CHARS ? 3 : undefined}>
             {post.text}
           </Text>
           {post.text.length > MAX_CHARS && (
@@ -184,32 +185,50 @@ export default function PostCard({ post }: { post: PostT }) {
       )}
 
       {/* Bet details (if parsed) or images (if not parsed) */}
-      {betsForPost.length > 0 ? (
-        // Render bet details
+      {post.parsed && post.parsed.length > 0 ? (
+        // Render parsed bet details - each post only has 1 parsed bet
+        <View style={tw`mb-6 mt-2 px-4`}>
+          <ParsedBetDetail parsedBet={post.parsed[0]} />
+        </View>
+      ) : betsForPost.length > 0 ? (
+        // Fallback to old bet structure for backward compatibility
         <View style={tw`mb-4 px-4`}>
-          {betsForPost.slice(0, isExpanded ? undefined : 2).map((b, index) => (
-            <View key={b.id} style={tw`mb-3`}>
-              <BetDetail bet={b} />
-            </View>
-          ))}
-          {betsForPost.length > 2 && (
-            <Pressable onPress={() => setIsExpanded(!isExpanded)} style={tw`mt-2`}>
-              <Text style={tw`text-gray-400`}>
-                {isExpanded ? 'Show less' : `View ${betsForPost.length - 2} more bet(s)…`}
-              </Text>
-            </Pressable>
-          )}
+          <BetDetail bet={betsForPost[0]} />
         </View>
       ) : showImages ? (
         // Render images using Threads-like gallery
-        <ImageGallery 
-          images={isExpanded ? (post.attachments ?? []).filter(a => a.type === "image") : images} 
-          onImagePress={handleImagePress}
-        />
-      ) : null}
+        <View style={tw`mb-4 px-4`}>
+          <ImageGallery 
+            images={isExpanded ? (post.attachments ?? []).filter(a => a.type === "image") : images} 
+            onImagePress={handleImagePress}
+          />
+          {/* Add betting caption for image posts */}
+          <View style={tw`mt-3 bg-neutral-900 border border-neutral-800 rounded-lg p-3`}>
+            <Text style={tw`text-sm text-neutral-300 text-center`}>
+              {post.id.length % 5 === 0 ? "📊 Betting insights and analysis" :
+               post.id.length % 5 === 1 ? "🎯 Line movement analysis" :
+               post.id.length % 5 === 2 ? "🔥 Player prop opportunities" :
+               post.id.length % 5 === 3 ? "⚡ Spread betting insights" :
+               "💎 Value betting analysis"}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        // Text-only posts without parsed bets - add betting indicator
+        <View style={tw`mb-4 px-4`}>
+          <View style={tw`bg-neutral-900 border border-neutral-800 rounded-lg p-3`}>
+            <Text style={tw`text-sm text-neutral-300 text-center`}>
+              {post.id.length % 4 === 0 ? "🎯 Betting analysis and insights" :
+               post.id.length % 4 === 1 ? "📈 Market analysis and trends" :
+               post.id.length % 4 === 2 ? "🔥 Hot betting opportunities" :
+               "⚡ Strategic betting insights"}
+            </Text>
+          </View>
+        </View>
+      )}
 
       {/* Footer: Emoji reactions with wrapping */}
-      <View style={tw`pt-3 px-4`}>
+      <View style={tw`pt-0 px-4`}>
         <View style={tw`flex-row items-center gap-2 flex-wrap`}>
           {/* Emoji reactions with counts */}
           {Object.entries(reactions).map(([emoji, count]) => {

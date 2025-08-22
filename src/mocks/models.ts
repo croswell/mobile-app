@@ -27,6 +27,17 @@ export const Bet = z.object({
   stake: z.number().optional(),
 });
 
+// New parsed bet structure for posts
+export const ParsedBet = z.object({
+  league: z.string(),        // NBA, NFL, MLB, NCAAB, etc.
+  event: z.string(),         // Matchup or player-specific event
+  market: z.string(),        // Moneyline, Spread, Player Prop, Parlay, etc.
+  line: z.string(),          // e.g., "Over 24.5", "-2.5", "+120"
+  odds: z.number(),          // actual odds, e.g., -110, +200
+  book: z.string(),          // DraftKings, FanDuel, PrizePicks, Underdog
+  eventTime: z.string(),     // ISO string in the near future
+});
+
 // Add attachment type
 export const Attachment = z.object({
   id: z.string(),
@@ -46,6 +57,7 @@ export const Post = z.object({
   extraction: z.enum(["parsed","partial","unparsed"]),
   text: z.string().default(""),
   betIds: z.array(z.string()).optional(),   // 0..N
+  parsed: z.array(ParsedBet).optional(),    // New parsed bet data
   attachments: z.array(Attachment).optional(),
   views: z.number(),
   tails: z.number(),
@@ -54,4 +66,5 @@ export const Post = z.object({
 export type BookT = z.infer<typeof Book>;
 export type PartnerT = z.infer<typeof Partner>;
 export type BetT = z.infer<typeof Bet>;
+export type ParsedBetT = z.infer<typeof ParsedBet>;
 export type PostT = z.infer<typeof Post>;
