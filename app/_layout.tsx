@@ -74,6 +74,12 @@ export default function RootLayout() {
                 href: null
               }} 
             />
+            <Tabs.Screen 
+              name="post/[id]" 
+              options={{ 
+                href: null
+              }} 
+            />
           </Tabs>
         </View>
         <AccountDrawer />

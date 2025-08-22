@@ -4,12 +4,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UserCircle, ChevronDown } from "lucide-react-native";
 import { useUI } from "../state/ui";
 import { useFeedFilter } from "../state/feedFilter";
+import { useData } from "../state/data";
 import { useEffect, useRef } from "react";
 
 export default function AppHeader() {
   const { top } = useSafeAreaInsets();
   const { clubFilterOpen, openClubFilter, toggleAccount } = useUI();
   const { selected } = useFeedFilter();
+  const { partners } = useData();
   const chevronRotation = useRef(new Animated.Value(0)).current;
 
   // Animate chevron rotation when drawer opens/closes
@@ -47,10 +49,10 @@ export default function AppHeader() {
             numberOfLines={1}
             style={tw`text-white text-2xl font-bold mr-1`}
           >
-            DubClubs
+            {selected === "All" ? "DubClubs" : selected}
           </Text>
           <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
-            <ChevronDown size={18} color="white" />
+            <ChevronDown size={24} color="white" />
           </Animated.View>
         </Pressable>
         

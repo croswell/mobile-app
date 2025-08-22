@@ -26,10 +26,10 @@ export default function BetDetail({ bet }: { bet: BetT }) {
     <View style={tw`w-full bg-neutral-950 border border-neutral-800 rounded-lg p-4`}>
       {/* Bet type details */}
       <View style={tw`mb-3`}>
-        <Text style={tw`text-sm text-neutral-300 mb-1`}>
+        <Text style={tw`text-base text-neutral-300 mb-1`}>
           {getBetTypeDetails(bet)}
         </Text>
-        <Text style={tw`text-sm text-neutral-300`}>
+        <Text style={tw`text-base text-neutral-300`}>
           {when(bet.startTime)}
         </Text>
       </View>
@@ -37,12 +37,12 @@ export default function BetDetail({ bet }: { bet: BetT }) {
       {/* Sports book with best odds */}
       <View style={tw`flex-row justify-between items-center mb-4`}>
         <View style={tw`bg-neutral-900 rounded-lg px-3 py-2`}>
-          <Text style={tw`text-xs text-neutral-400 mb-1`}>Book</Text>
-          <Text style={tw`text-sm text-neutral-100 font-medium`}>{bet.bookId}</Text>
+          <Text style={tw`text-base text-neutral-400 mb-1`}>Book</Text>
+          <Text style={tw`text-base text-neutral-100 font-medium`}>{bet.bookId}</Text>
         </View>
         <View style={tw`bg-neutral-900 rounded-lg px-3 py-2`}>
-          <Text style={tw`text-xs text-neutral-400 mb-1`}>Odds</Text>
-          <Text style={tw`text-sm text-neutral-100 font-medium`}>{prettyOdds(bet.odds)}</Text>
+          <Text style={tw`text-base text-neutral-400 mb-1`}>Odds</Text>
+          <Text style={tw`text-base text-neutral-100 font-medium`}>{prettyOdds(bet.odds)}</Text>
         </View>
       </View>
 
