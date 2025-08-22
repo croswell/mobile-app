@@ -4,7 +4,7 @@ import tw from '../lib/tw';
 import type { AttachmentT } from '../mocks/models';
 
 const { width: screenWidth } = Dimensions.get('window');
-const POST_PADDING = 32; // 16px on each side
+const POST_PADDING = 32; // 16px on each side (from PostCard)
 const AVAILABLE_WIDTH = screenWidth - POST_PADDING;
 
 interface ImageGalleryProps {
@@ -125,7 +125,7 @@ export default function ImageGallery({ images, onImagePress }: ImageGalleryProps
     const isLocal = isLocalPlaceholder(image.url);
 
     return (
-      <View style={tw`mb-4 px-4`}>
+      <View style={tw`mb-4`}>
         <Pressable 
           onPress={() => onImagePress?.(image, 0)}
           style={tw`w-full aspect-square rounded-2xl overflow-hidden`}
@@ -182,7 +182,7 @@ export default function ImageGallery({ images, onImagePress }: ImageGalleryProps
     const imageHeight = imageWidth; // Square aspect ratio
 
     return (
-      <View style={tw`mb-4 px-4`}>
+      <View style={tw`mb-4`}>
         <View style={tw`flex-row gap-2`}>
           {images.map((image, index) => {
             const isLoading = loadingImages.has(image.id);

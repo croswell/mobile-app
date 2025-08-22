@@ -202,28 +202,10 @@ export default function PostCard({ post }: { post: PostT }) {
             images={isExpanded ? (post.attachments ?? []).filter(a => a.type === "image") : images} 
             onImagePress={handleImagePress}
           />
-          {/* Add betting caption for image posts */}
-          <View style={tw`mt-3 bg-neutral-900 border border-neutral-800 rounded-lg p-3`}>
-            <Text style={tw`text-sm text-neutral-300 text-center`}>
-              {post.id.length % 5 === 0 ? "📊 Betting insights and analysis" :
-               post.id.length % 5 === 1 ? "🎯 Line movement analysis" :
-               post.id.length % 5 === 2 ? "🔥 Player prop opportunities" :
-               post.id.length % 5 === 3 ? "⚡ Spread betting insights" :
-               "💎 Value betting analysis"}
-            </Text>
-          </View>
         </View>
       ) : (
-        // Text-only posts without parsed bets - add betting indicator
+        // Text-only posts without parsed bets
         <View style={tw`mb-4 px-4`}>
-          <View style={tw`bg-neutral-900 border border-neutral-800 rounded-lg p-3`}>
-            <Text style={tw`text-sm text-neutral-300 text-center`}>
-              {post.id.length % 4 === 0 ? "🎯 Betting analysis and insights" :
-               post.id.length % 4 === 1 ? "📈 Market analysis and trends" :
-               post.id.length % 4 === 2 ? "🔥 Hot betting opportunities" :
-               "⚡ Strategic betting insights"}
-            </Text>
-          </View>
         </View>
       )}
 
@@ -241,7 +223,7 @@ export default function PostCard({ post }: { post: PostT }) {
               <Animated.View key={emoji} style={animatedStyle}>
                 <Pressable 
                   style={[
-                    tw`flex-row items-center rounded-md px-2 py-1 border h-7`,
+                    tw`flex-row items-center rounded-md px-2 py-1 border h-8`,
                     isSelected 
                       ? { backgroundColor: '#003d12', borderColor: '#00D639' }
                       : tw`bg-neutral-900 border-transparent`
@@ -260,7 +242,7 @@ export default function PostCard({ post }: { post: PostT }) {
           
           {/* Add reaction button */}
           <Pressable 
-            style={tw`w-7 h-7 items-center justify-center rounded-md bg-neutral-800`}
+            style={tw`w-8 h-8 items-center justify-center rounded-md bg-neutral-800`}
             onPress={() => openEmojiPicker(post.id)}
           >
             <Smile size={16} color="#9CA3AF" />
