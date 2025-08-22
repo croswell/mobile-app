@@ -15,12 +15,26 @@ export function makeSeed(): {
     { id: "mgm", name: "BetMGM" },
   ];
 
-  const partners: PartnerT[] = Array.from({ length: 6 }).map(() => ({
-    id: faker.string.uuid(),
-    name: faker.internet.displayName(),
-    avatar: faker.image.avatar(),
-    isSubscribed: faker.datatype.boolean(),
-  }));
+  const partners: PartnerT[] = [
+    {
+      id: faker.string.uuid(),
+      name: "SecuredPicks",
+      avatar: "secured-picks",
+      isSubscribed: true,
+    },
+    {
+      id: faker.string.uuid(),
+      name: "HammeringHank", 
+      avatar: "hammering-hank",
+      isSubscribed: true,
+    },
+    {
+      id: faker.string.uuid(),
+      name: "ChillyBets",
+      avatar: "chilly-bets",
+      isSubscribed: true,
+    }
+  ];
 
   // Create more realistic game data with better market distribution
   const games = [

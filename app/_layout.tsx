@@ -5,6 +5,7 @@ import { View, Text, StatusBar } from "react-native";
 import tw from "../src/lib/tw";
 import AppHeader from "../src/components/AppHeader";
 import AccountDrawer from "../src/components/AccountDrawer";
+import ClubFilterDrawer from "../src/components/ClubFilterDrawer";
 
 export default function RootLayout() {
   return (
@@ -19,7 +20,7 @@ export default function RootLayout() {
               headerShown: false,
               tabBarStyle: { 
                 backgroundColor: "#0a0a0a",
-                borderTopColor: "#262626",
+                borderTopColor: "#0A0A0A",
                 borderTopWidth: 1,
               },
               tabBarActiveTintColor: "#00D639",
@@ -62,6 +63,7 @@ export default function RootLayout() {
           </Tabs>
         </View>
         <AccountDrawer />
+        <ClubFilterDrawer />
       </View>
     </GestureHandlerRootView>
   );

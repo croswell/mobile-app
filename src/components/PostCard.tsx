@@ -10,11 +10,28 @@ export default function PostCard({ post }: { post: PostT }) {
   const partner = partners.find((p: any) => p.id === post.partnerId) as PartnerT | undefined;
   const bet = post.betId ? (bets.find((b: any) => b.id === post.betId) as BetT | undefined) : undefined;
 
+  // Function to get avatar source
+  const getAvatarSource = (avatar: string) => {
+    switch (avatar) {
+      case 'secured-picks':
+        return require('../../assets/images/secured-picks.jpg');
+      case 'hammering-hank':
+        return require('../../assets/images/hammering-hank.jpg');
+      case 'chilly-bets':
+        return require('../../assets/images/chilly-bets.jpg');
+      default:
+        return { uri: avatar };
+    }
+  };
+
   return (
     <View style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-4`}>
       <View style={tw`flex-row items-center mb-2`}>
         {partner?.avatar ? (
-          <Image source={{ uri: partner.avatar }} style={tw`w-8 h-8 rounded-full mr-2`} />
+          <Image 
+            source={getAvatarSource(partner.avatar)}
+            style={tw`w-8 h-8 rounded-full mr-2`} 
+          />
         ) : (
           <View style={tw`w-8 h-8 rounded-full mr-2 bg-neutral-700 items-center justify-center`}>
             <User size={16} color="#9ca3af" />
