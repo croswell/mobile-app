@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
-import tw from "../src/lib/tw";
-import { useData } from "../src/state/data";
-import BetRow from "../src/components/BetRow";
-import type { BetT } from "../src/mocks/models";
+import tw from "../../src/lib/tw";
+import { useData } from "../../src/state/data";
+import BetRow from "../../src/components/BetRow";
+import type { BetT } from "../../src/mocks/models";
 
 type TabKey = "Active" | "Completed";
 

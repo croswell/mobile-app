@@ -9,6 +9,8 @@ import { when } from "../lib/format";
 import BetDetail from "./BetDetail";
 import { postBets, ctaLabelForPost, hasImages } from "../lib/post";
 import { router } from "expo-router";
+import ImageGallery from "./ImageGallery";
+import ImageLightbox from "./ImageLightbox";
 
 const MAX_CHARS = 200;
 
@@ -19,6 +21,13 @@ export default function PostCard({ post }: { post: PostT }) {
   const betsForPost = postBets(post, bets);
   const showImages = betsForPost.length === 0 && hasImages(post);
   const images = (post.attachments ?? []).filter(a => a.type === "image").slice(0,3);
+  
+  // State to track if this post is expanded
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Lightbox state
+  const [lightboxVisible, setLightboxVisible] = useState(false);
+  const [lightboxInitialIndex, setLightboxInitialIndex] = useState(0);
 
   // Emoji reaction state - unique per post
   const [reactions, setReactions] = useState<Record<string, number>>({
@@ -119,6 +128,12 @@ export default function PostCard({ post }: { post: PostT }) {
     setSelectedReactions(newSelected);
   };
 
+  // Function to handle image tap and open lightbox
+  const handleImagePress = (image: any, index: number) => {
+    setLightboxInitialIndex(index);
+    setLightboxVisible(true);
+  };
+
   // Function to get avatar source
   const getAvatarSource = (avatar: string) => {
     switch (avatar) {
@@ -155,12 +170,14 @@ export default function PostCard({ post }: { post: PostT }) {
       {/* Post text with show more logic */}
       {!!post.text && (
         <View style={tw`px-4`}>
-          <Text style={tw`text-gray-100 text-base leading-6 mb-3`} numberOfLines={post.text.length > MAX_CHARS ? undefined : undefined}>
+          <Text style={tw`text-gray-100 text-base leading-6 mb-3`} numberOfLines={!isExpanded && post.text.length > MAX_CHARS ? 3 : undefined}>
             {post.text}
           </Text>
           {post.text.length > MAX_CHARS && (
-            <Pressable onPress={() => router.push(`/post/${post.id}`)} style={tw`mb-3`}>
-              <Text style={tw`text-neutral-500 font-medium`}>Show more</Text>
+            <Pressable onPress={() => setIsExpanded(!isExpanded)} style={tw`mb-3`}>
+              <Text style={tw`text-green-500 font-semibold`}>
+                {isExpanded ? 'Show less' : 'Show more'}
+              </Text>
             </Pressable>
           )}
         </View>
@@ -170,26 +187,25 @@ export default function PostCard({ post }: { post: PostT }) {
       {betsForPost.length > 0 ? (
         // Render bet details
         <View style={tw`mb-4 px-4`}>
-          {betsForPost.slice(0,2).map((b, index) => (
+          {betsForPost.slice(0, isExpanded ? undefined : 2).map((b, index) => (
             <View key={b.id} style={tw`mb-3`}>
               <BetDetail bet={b} />
             </View>
           ))}
           {betsForPost.length > 2 && (
-            <Pressable onPress={() => router.push(`/post/${post.id}`)} style={tw`mt-2`}>
-              <Text style={tw`text-gray-400`}>View {betsForPost.length - 2} more bet(s)…</Text>
+            <Pressable onPress={() => setIsExpanded(!isExpanded)} style={tw`mt-2`}>
+              <Text style={tw`text-gray-400`}>
+                {isExpanded ? 'Show less' : `View ${betsForPost.length - 2} more bet(s)…`}
+              </Text>
             </Pressable>
           )}
         </View>
       ) : showImages ? (
-        // Render images if no bets
-        <View style={tw`mb-4 flex-row gap-2 px-4`}>
-          {images.map(img => (
-            <Pressable key={img.id} onPress={() => router.push(`/post/${post.id}`)}>
-              <Image source={{ uri: img.url }} style={tw`w-24 h-24 rounded-xl`} />
-            </Pressable>
-          ))}
-        </View>
+        // Render images using Threads-like gallery
+        <ImageGallery 
+          images={isExpanded ? (post.attachments ?? []).filter(a => a.type === "image") : images} 
+          onImagePress={handleImagePress}
+        />
       ) : null}
 
       {/* Footer: Emoji reactions with wrapping */}
@@ -214,7 +230,10 @@ export default function PostCard({ post }: { post: PostT }) {
                   onPress={() => handleReaction(emoji)}
                 >
                   <Text style={tw`text-sm mr-1`}>{emoji}</Text>
-                  <Text style={tw`text-xs text-neutral-300`}>{count}</Text>
+                  <Text style={[
+                    tw`text-xs font-bold`,
+                    isSelected ? tw`text-brand` : tw`text-neutral-400`
+                  ]}>{count}</Text>
                 </Pressable>
               </Animated.View>
             );
@@ -229,8 +248,15 @@ export default function PostCard({ post }: { post: PostT }) {
           </Pressable>
         </View>
       </View>
-    </View>
 
-  </>
+      {/* Image Lightbox */}
+      <ImageLightbox
+        visible={lightboxVisible}
+        images={(post.attachments ?? []).filter(a => a.type === "image")}
+        initialIndex={lightboxInitialIndex}
+        onClose={() => setLightboxVisible(false)}
+      />
+      </View>
+    </>
   );
 }

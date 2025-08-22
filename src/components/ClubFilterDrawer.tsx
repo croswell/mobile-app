@@ -4,7 +4,7 @@ import BottomSheet from "./BottomSheet";
 import { useUI } from "../state/ui";
 import { useData } from "../state/data";
 import { useFeedFilter } from "../state/feedFilter";
-import { Check } from "lucide-react-native";
+import { Check, Compass } from "lucide-react-native";
 
 export default function ClubFilterDrawer() {
   const { clubFilterOpen, closeClubFilter } = useUI();
@@ -39,6 +39,22 @@ export default function ClubFilterDrawer() {
           );
         }}
       />
+      
+      {/* Find a DubClub button */}
+      <Pressable
+        style={tw`mt-4 border border-neutral-700 rounded-xl px-4 py-3`}
+        onPress={() => {
+          // TODO: Implement find a DubClub functionality
+          closeClubFilter();
+        }}
+        accessibilityRole="button"
+        accessibilityLabel="Explore DubClubs"
+      >
+        <View style={tw`flex-row items-center justify-center`}>
+          <Compass size={18} color="#22C55E" />
+          <Text style={tw`text-green-500 text-base ml-2 font-medium`}>Explore DubClubs</Text>
+        </View>
+      </Pressable>
     </BottomSheet>
   );
 }

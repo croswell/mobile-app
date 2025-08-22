@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { View, Text, TextInput, FlatList, Pressable, ScrollView } from "react-native";
-import tw from "../src/lib/tw";
-import { useData } from "../src/state/data";
-import { groupBy } from "../src/lib/group";
-import GameRow from "../src/components/GameRow";
-import type { BetT } from "../src/mocks/models";
+import tw from "../../src/lib/tw";
+import { useData } from "../../src/state/data";
+import { groupBy } from "../../src/lib/group";
+import GameRow from "../../src/components/GameRow";
+import type { BetT } from "../../src/mocks/models";
 
 const LEAGUES: BetT["league"][] = ["NFL","NBA","MLB","NHL","NCAAF","NCAAB"];
 

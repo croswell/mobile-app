@@ -1,8 +1,8 @@
 import { View, FlatList } from "react-native";
-import tw from "../src/lib/tw";
-import { useData } from "../src/state/data";
-import { useFeedFilter } from "../src/state/feedFilter";
-import PostCard from "../src/components/PostCard";
+import tw from "../../src/lib/tw";
+import { useData } from "../../src/state/data";
+import { useFeedFilter } from "../../src/state/feedFilter";
+import PostCard from "../../src/components/PostCard";
 
 export default function Home() {
   const { posts, partners } = useData();
