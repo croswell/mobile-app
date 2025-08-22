@@ -1,89 +1,71 @@
 import { useEffect, useState } from "react";
 import { View, Text, Image, Pressable } from "react-native";
+import tw from "../lib/tw";
 import { financeApi } from "../lib/mockFinance";
-import type { LinkedAccount, EarningsPoint } from "../types/finance";
-import Sparkline from "./Sparkline";
-import AccountsDrawer from "./AccountsDrawer";
+import type { LinkedAccount } from "../types/finance";
+import { useUI } from "../state/ui";
+import { BookOpen } from "lucide-react-native";
 
 export default function PlaysSummaryHeader() {
   const [bankroll, setBankroll] = useState(0);
   const [atRisk, setAtRisk] = useState(0);
   const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
-
-  const [history, setHistory] = useState<EarningsPoint[]>([]);
-  const [showAccountsDrawer, setShowAccountsDrawer] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date>(new Date());
+  
+  const { openBookDrawer } = useUI();
 
   const load = async () => {
-    const [accs, br, risk, hist] = await Promise.all([
+    const [accs, br, risk] = await Promise.all([
       financeApi.getAccounts(),
       financeApi.getTotalBankroll(),
       financeApi.getAtRisk(),
-      financeApi.getEarningsHistory(7),
     ]);
-    setAccounts(accs); setBankroll(br); setAtRisk(risk); setHistory(hist);
+    setAccounts(accs); setBankroll(br); setAtRisk(risk);
     setLastSynced(new Date());
   };
 
   useEffect(() => { load(); }, []);
 
-  const cash = accounts.reduce((s,a)=>s+a.cashBalance,0);
-  const profitThisWeek = history.reduce((s,p)=>s+p.profit,0);
-
   return (
-    <View style={{ backgroundColor: "#0f172a", padding: 16, borderRadius: 16, borderWidth: 1, borderColor: "#334155", marginBottom: 12 }}>
-
-
+    <View style={tw`bg-neutral-900 p-4 rounded-2xl border border-neutral-800 mb-6`}>
       {/* Top row: bankroll + at risk */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }}>
+      <View style={tw`flex-row justify-between mb-6`}>
         <View>
-          <Text style={{ color: "#94a3b8" }}>Total bankroll →</Text>
-          <Text style={{ color: "#22c55e", fontSize: 24, fontWeight: "800" }}>${bankroll.toFixed(2)}</Text>
+          <Text style={tw`text-neutral-400 mb-1`}>Total Bankroll</Text>
+          <Text style={tw`text-brand text-2xl font-bold`}>${bankroll.toFixed(2)}</Text>
         </View>
         <View>
-          <Text style={{ color: "#94a3b8" }}>At risk →</Text>
-          <Text style={{ color: "#94a3b8", fontSize: 24, fontWeight: "800" }}>${atRisk.toFixed(2)}</Text>
-        </View>
-      </View>
-
-      {/* Mini chart */}
-      <View style={{ backgroundColor: "white", borderRadius: 12, overflow: "hidden", padding: 12, marginBottom: 12 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-          <Text style={{ fontWeight: "700" }}>This week</Text>
-          <Text style={{ color: "#2563eb", fontWeight: "700" }}>View more →</Text>
-        </View>
-        <Sparkline data={history} />
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
-          <Text style={{ fontWeight: "700", color: profitThisWeek >= 0 ? "#16a34a" : "#dc2626" }}>
-            {profitThisWeek >= 0 ? "+" : "-"}${Math.abs(profitThisWeek).toFixed(2)}
-          </Text>
-          {/* simple placeholders; wire real ROI/record later */}
-          <Text>ROI — • Record —</Text>
+          <Text style={tw`text-neutral-400 mb-1`}>At Risk</Text>
+          <Text style={tw`text-neutral-300 text-2xl font-bold`}>${atRisk.toFixed(2)}</Text>
         </View>
       </View>
 
       {/* Accounts row */}
-      <Text style={{ color: "white", fontWeight: "700", marginBottom: 8 }}>Your accounts</Text>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={tw`flex-row items-center`}>
         {accounts.map(a => (
-          <View key={a.id} style={{ marginRight: 10, alignItems: "center" }}>
-            <Pressable onPress={() => setShowAccountsDrawer(true)} style={{ width: 36, height: 36, borderRadius: 8, overflow: "hidden", backgroundColor: "#1e293b" }}>
-              <Image source={{ uri: a.logo }} style={{ width: 36, height: 36 }} />
+          <View key={a.id} style={tw`mr-2.5 items-center`}>
+            <Pressable 
+              onPress={openBookDrawer} 
+              style={tw`w-8 h-8 rounded-md overflow-hidden bg-neutral-800`}
+              accessibilityRole="button"
+              accessibilityLabel={`Open book drawer for ${a.name}`}
+            >
+              <Image source={{ uri: a.logo }} style={tw`w-8 h-8`} />
             </Pressable>
           </View>
         ))}
-        <View style={{ marginLeft: "auto" }}>
-          <Text style={{ color: "#94a3b8" }}>Last synced</Text>
-          <Text style={{ color: "white", fontWeight: "700" }}>{lastSynced.toLocaleTimeString()}</Text>
+        
+        <View style={tw`ml-auto`}>
+          <Pressable
+            style={tw`bg-neutral-800 border border-neutral-700 rounded-md px-3 py-2`}
+            onPress={openBookDrawer}
+            accessibilityRole="button"
+            accessibilityLabel="Manage accounts"
+          >
+            <Text style={tw`text-neutral-300 text-sm font-medium`}>Manage</Text>
+          </Pressable>
         </View>
       </View>
-
-      {/* Accounts Drawer */}
-      <AccountsDrawer 
-        accounts={accounts}
-        visible={showAccountsDrawer}
-        onClose={() => setShowAccountsDrawer(false)}
-      />
     </View>
   );
 }

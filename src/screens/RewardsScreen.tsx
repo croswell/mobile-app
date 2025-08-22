@@ -12,22 +12,21 @@ function Dollar({ value }: { value: number }) {
 function PromoItem({ item, onClaim }: { item: PromoOffer; onClaim: (id: string) => void }) {
   return (
     <View style={tw`bg-neutral-900 rounded-xl p-4 mb-4 border border-neutral-800`}>
-      <View style={tw`flex-row items-start mb-3`}>
-        <Image source={{ uri: item.logo }} style={{ width: 48, height: 48, borderRadius: 12, marginRight: 12 }} />
-        <View style={tw`flex-1`}>
-          <Text style={tw`text-white text-lg font-bold mb-1`}>{item.providerName}</Text>
-          <Text style={tw`text-neutral-300 text-base mb-2`}>{item.title}</Text>
-          <Text style={tw`text-neutral-400 text-sm leading-5`}>{item.description}</Text>
+      <View style={tw`mb-3`}>
+        <View style={tw`flex-row items-center mb-3`}>
+          <Image source={{ uri: item.logo }} style={{ width: 32, height: 32, borderRadius: 8, marginRight: 12 }} />
+          <Text style={tw`text-white text-lg font-bold`}>{item.providerName}</Text>
         </View>
+        <Text style={tw`text-neutral-300 text-base mb-2`}>{item.title}</Text>
+        <Text style={tw`text-neutral-400 text-sm leading-5`}>{item.description}</Text>
       </View>
       <View style={tw`flex-row items-center justify-between`}>  
-        <Text style={tw`text-brand font-semibold text-lg`}>${item.rewardValueUsd}</Text>
         <Pressable
           onPress={() => onClaim(item.id)}
           disabled={!!item.claimed}
-          style={tw`px-6 py-3 rounded-lg ${item.claimed ? "bg-neutral-700" : "bg-brand"}`}
+          style={tw`flex-1 px-6 py-4 rounded-lg ${item.claimed ? "bg-neutral-700" : "bg-brand"}`}
         >
-          <Text style={tw`font-semibold ${item.claimed ? "text-neutral-300" : "text-neutral-950"}`}>
+          <Text style={tw`font-bold text-center uppercase ${item.claimed ? "text-neutral-300" : "text-neutral-950"}`}>
             {item.claimed ? "Claimed" : item.ctaLabel}
           </Text>
         </Pressable>

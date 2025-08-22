@@ -34,7 +34,7 @@ export default function Plays() {
       <PlaysSummaryHeader />
       
       {/* Segmented tabs */}
-      <View style={{ marginBottom: 12 }}>
+      <View style={{ marginBottom: 24 }}>
         <SegmentedTabs
           tabs={[
             { key: "Active", label: "Active" },

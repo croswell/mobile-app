@@ -12,7 +12,7 @@ type Props = {
   initialHeight?: number;
 };
 
-export default function BottomSheet({ open, onClose, children, initialHeight = SCREEN_H * 0.45 }: Props) {
+export default function BottomSheet({ open, onClose, children, initialHeight = SCREEN_H * 0.40 }: Props) {
   // Use the provided height but add space for navigation bar coverage
   const minHeight = Math.max(initialHeight, 250);
   const translateY = useRef(new Animated.Value(minHeight + 120)).current;

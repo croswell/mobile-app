@@ -15,6 +15,10 @@ type UIState = {
   openClubFilter: () => void;
   closeClubFilter: () => void;
   toggleClubFilter: () => void;
+  bookDrawerOpen: boolean;
+  openBookDrawer: () => void;
+  closeBookDrawer: () => void;
+  toggleBookDrawer: () => void;
 };
 
 export const useUI = create<UIState>((set, get) => ({
@@ -32,4 +36,8 @@ export const useUI = create<UIState>((set, get) => ({
   openClubFilter: () => set({ clubFilterOpen: true }),
   closeClubFilter: () => set({ clubFilterOpen: false }),
   toggleClubFilter: () => set((s) => ({ clubFilterOpen: !s.clubFilterOpen })),
+  bookDrawerOpen: false,
+  openBookDrawer: () => set({ bookDrawerOpen: true }),
+  closeBookDrawer: () => set({ bookDrawerOpen: false }),
+  toggleBookDrawer: () => set((s) => ({ bookDrawerOpen: !s.bookDrawerOpen })),
 }));

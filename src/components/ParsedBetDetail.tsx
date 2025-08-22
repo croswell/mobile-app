@@ -115,7 +115,7 @@ export default function ParsedBetDetail({ parsedBet }: { parsedBet: ParsedBetT }
   return (
     <View style={tw`w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-4`}>
       {/* League, team abbreviations, and date/time at the top */}
-      <View style={tw`mb-3`}>
+      <View style={tw`mb-2`}>
         <View style={tw`flex-row items-center`}>
           <Text style={tw`text-sm text-gray-400 mr-2`}>
             {parsedBet.league}

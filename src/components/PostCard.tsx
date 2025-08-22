@@ -153,7 +153,7 @@ export default function PostCard({ post }: { post: PostT }) {
     <>
       <View style={tw`bg-neutral-950 py-6 mb-0 border-b border-neutral-800`}>
       {/* Header: Partner logo + name on left, timestamp on right */}
-      <View style={tw`flex-row items-center justify-between mb-6 px-4`}>
+      <View style={tw`flex-row items-center justify-between mb-4 px-4`}>
         <View style={tw`flex-row items-center`}>
           {partner?.avatar ? (
             <Image 
@@ -170,7 +170,7 @@ export default function PostCard({ post }: { post: PostT }) {
 
       {/* Post text with show more logic */}
       {!!post.text && (
-        <View style={tw`px-4 mb-4`}>
+        <View style={tw`px-4 mb-0`}>
           <Text style={tw`text-neutral-100 text-base leading-6 mb-3`} numberOfLines={!isExpanded && post.text.length > MAX_CHARS ? 3 : undefined}>
             {post.text}
           </Text>
@@ -187,7 +187,7 @@ export default function PostCard({ post }: { post: PostT }) {
       {/* Bet details (if parsed) or images (if not parsed) */}
       {post.parsed && post.parsed.length > 0 ? (
         // Render parsed bet details - each post only has 1 parsed bet
-        <View style={tw`mb-6 mt-2 px-4`}>
+        <View style={tw`mb-4 mt-2 px-4`}>
           <ParsedBetDetail parsedBet={post.parsed[0]} />
         </View>
       ) : betsForPost.length > 0 ? (
@@ -210,7 +210,7 @@ export default function PostCard({ post }: { post: PostT }) {
       )}
 
       {/* Footer: Emoji reactions with wrapping */}
-      <View style={tw`pt-0 px-4`}>
+      <View style={tw`pt-2 px-4`}>
         <View style={tw`flex-row items-center gap-2 flex-wrap`}>
           {/* Emoji reactions with counts */}
           {Object.entries(reactions).map(([emoji, count]) => {

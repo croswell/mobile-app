@@ -6,6 +6,7 @@ import tw from "../src/lib/tw";
 import AppHeader from "../src/components/AppHeader";
 import AccountDrawer from "../src/components/AccountDrawer";
 import ClubFilterDrawer from "../src/components/ClubFilterDrawer";
+import BookDrawer from "../src/components/BookDrawer";
 import BottomSheet from "../src/components/BottomSheet";
 import { useEmojiPicker } from "../src/state/emojiPicker";
 
@@ -39,6 +40,7 @@ export default function RootLayout() {
         </Stack>
         <AccountDrawer />
         <ClubFilterDrawer />
+        <BookDrawer />
         
         {/* Global Emoji Picker Bottom Sheet */}
         <BottomSheet open={showEmojiPicker} onClose={closeEmojiPicker} initialHeight={280}>
