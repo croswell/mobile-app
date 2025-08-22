@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, Search, DollarSign } from "lucide-react-native";
+import { Home, Search, DollarSign, Gift } from "lucide-react-native";
 
 export default function TabsLayout() {
   return (
@@ -37,6 +37,13 @@ export default function TabsLayout() {
         options={{ 
           title: "My Plays",
           tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />
+        }} 
+      />
+      <Tabs.Screen 
+        name="rewards" 
+        options={{ 
+          title: "Rewards",
+          tabBarIcon: ({ color, size }) => <Gift size={size} color={color} />
         }} 
       />
 
