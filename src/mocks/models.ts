@@ -27,13 +27,26 @@ export const Bet = z.object({
   stake: z.number().optional(),
 });
 
+// Add attachment type
+export const Attachment = z.object({
+  id: z.string(),
+  type: z.enum(["image","link"]),
+  url: z.string(),
+  title: z.string().optional(),
+});
+
+export type AttachmentT = z.infer<typeof Attachment>;
+
+// Update Post schema
 export const Post = z.object({
   id: z.string(),
   partnerId: z.string(),
   createdAt: z.date(),
-  type: z.enum(["parsed","unparsed"]),
-  text: z.string(),
-  betId: z.string().optional(),
+  // parsed = all bets extracted; partial = some extracted; unparsed = none
+  extraction: z.enum(["parsed","partial","unparsed"]),
+  text: z.string().default(""),
+  betIds: z.array(z.string()).optional(),   // 0..N
+  attachments: z.array(Attachment).optional(),
   views: z.number(),
   tails: z.number(),
 });

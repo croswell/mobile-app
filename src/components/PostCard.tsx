@@ -1,14 +1,20 @@
 import { View, Text, Pressable, Image } from "react-native";
-import tw from "../../lib/tw";
+import tw from "../lib/tw";
 import { useData } from "../state/data";
-import type { PostT, BetT, PartnerT } from "../mocks/models";
-import { prettyOdds, when } from "../lib/format";
-import { Eye, TrendingUp, User, Clock } from "lucide-react-native";
+import type { PostT } from "../mocks/models";
+import { when } from "../lib/format";
+import BetDetail from "./BetDetail";
+import { postBets, ctaLabelForPost, hasImages } from "../lib/post";
+import { router } from "expo-router";
+
+const MAX_LINES = 4;
 
 export default function PostCard({ post }: { post: PostT }) {
   const { bets, partners } = useData();
-  const partner = partners.find((p: any) => p.id === post.partnerId) as PartnerT | undefined;
-  const bet = post.betId ? (bets.find((b: any) => b.id === post.betId) as BetT | undefined) : undefined;
+  const partner = partners.find(p => p.id === post.partnerId);
+  const betsForPost = postBets(post, bets);
+  const showImages = betsForPost.length === 0 && hasImages(post);
+  const images = (post.attachments ?? []).filter(a => a.type === "image").slice(0,3);
 
   // Function to get avatar source
   const getAvatarSource = (avatar: string) => {
@@ -25,51 +31,74 @@ export default function PostCard({ post }: { post: PostT }) {
   };
 
   return (
-    <View style={tw`bg-neutral-900 border border-neutral-800 rounded-xl p-4 mb-4`}>
-      <View style={tw`flex-row items-center mb-2`}>
+    <View style={tw`rounded-3xl bg-neutral-900 px-4 py-4 mb-3`}>
+      {/* author row */}
+      <View style={tw`flex-row items-center mb-3`}>
         {partner?.avatar ? (
           <Image 
             source={getAvatarSource(partner.avatar)}
             style={tw`w-8 h-8 rounded-full mr-2`} 
           />
-        ) : (
-          <View style={tw`w-8 h-8 rounded-full mr-2 bg-neutral-700 items-center justify-center`}>
-            <User size={16} color="#9ca3af" />
-          </View>
-        )}
-        <Text style={tw`font-semibold text-neutral-100`}>{partner?.name ?? "Partner"}</Text>
-        <View style={tw`ml-auto flex-row items-center`}>
-          <Clock size={12} color="#9ca3af" style={tw`mr-1`} />
-          <Text style={tw`text-xs text-neutral-400`}>{when(post.createdAt)}</Text>
-        </View>
+        ) : null}
+        <Text style={tw`text-white font-semibold flex-1`} numberOfLines={1}>
+          {partner?.name ?? "Partner"}
+        </Text>
+        <Text style={tw`text-xs text-gray-400`}>{when(post.createdAt)}</Text>
       </View>
 
-      <Text style={tw`mb-3 text-neutral-200`}>{post.text}</Text>
+      {/* text preview */}
+      {!!post.text && (
+        <>
+          <Text style={tw`text-gray-100`} numberOfLines={MAX_LINES}>
+            {post.text}
+          </Text>
+          {post.text.length > 140 && (
+            <Pressable onPress={() => router.push(`/post/${post.id}`)} style={tw`mt-2`}>
+              <Text style={tw`text-green-400 font-semibold`}>Show more</Text>
+            </Pressable>
+          )}
+        </>
+      )}
 
-      {bet ? (
-        <View style={tw`border border-neutral-700 rounded-lg p-3 mb-3 bg-neutral-800`}>
-          <Text style={tw`font-semibold text-neutral-100`}>{bet.game}</Text>
-          <Text style={tw`text-neutral-300`}>
-            {bet.market} {bet.line} ({prettyOdds(bet.odds)}) • Book: {bet.bookId}
-          </Text>
+      {/* images (only when no parsed bets) */}
+      {showImages && (
+        <View style={tw`mt-3 flex-row gap-2`}>
+          {images.map(img => (
+            <Pressable key={img.id} onPress={() => router.push(`/post/${post.id}`)}>
+              <Image source={{ uri: img.url }} style={tw`w-24 h-24 rounded-xl`} />
+            </Pressable>
+          ))}
         </View>
-      ) : null}
+      )}
 
-      <View style={tw`flex-row justify-between items-center`}>
-        <View style={tw`flex-row items-center`}>
-          <Eye size={12} color="#9ca3af" style={tw`mr-1`} />
-          <Text style={tw`text-xs text-neutral-400 mr-3`}>
-            {post.views} views
-          </Text>
-          <TrendingUp size={12} color="#9ca3af" style={tw`mr-1`} />
-          <Text style={tw`text-xs text-neutral-400`}>
-            {post.tails} tails
-          </Text>
+      {/* parsed bets → render up to 2 modules; more → view detail */}
+      {betsForPost.length > 0 && (
+        <View style={tw`mt-3`}>
+          {betsForPost.slice(0,2).map(b => (
+            <View key={b.id} style={tw`mb-3`}>
+              <BetDetail bet={b} />
+            </View>
+          ))}
+          {betsForPost.length > 2 && (
+            <Pressable onPress={() => router.push(`/post/${post.id}`)} style={tw`-mt-1 mb-2`}>
+              <Text style={tw`text-gray-400`}>View {betsForPost.length - 2} more bet(s)…</Text>
+            </Pressable>
+          )}
         </View>
-        <Pressable style={tw`bg-brand rounded-lg px-3 py-2`}>
-          <Text style={tw`text-neutral-950 text-sm`}>
-            {post.type === "parsed" && bet ? "Bet Now" : "Follow Play"}
-          </Text>
+      )}
+
+      {/* footer */}
+      <View style={tw`flex-row items-center justify-between mt-2`}>
+        <Text style={tw`text-xs text-gray-400`}>
+          {post.views} views • {post.tails} tailing
+        </Text>
+        <Pressable
+          style={tw`bg-green-500 rounded-xl px-3 py-2`}
+          onPress={() => router.push(`/post/${post.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={ctaLabelForPost(post)}
+        >
+          <Text style={tw`text-black font-semibold text-sm`}>{ctaLabelForPost(post)}</Text>
         </Pressable>
       </View>
     </View>

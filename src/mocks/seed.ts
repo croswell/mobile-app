@@ -97,15 +97,31 @@ export function makeSeed(): {
   }
 
   const posts: PostT[] = Array.from({ length: 28 }).map(() => {
-    const parsed = faker.datatype.boolean();
-    const bet = parsed ? pick(bets) : undefined;
+    const roll = faker.number.int({ min: 1, max: 10 }); // 1..10
+    const isParsed = roll <= 4;
+    const isPartial = roll > 4 && roll <= 7;
+
+    const attachCount = isPartial ? faker.number.int({ min: 1, max: 3 }) : 0;
+    const attachments = attachCount
+      ? Array.from({ length: attachCount }).map(() => ({
+          id: faker.string.uuid(),
+          type: "image" as const,
+          url: faker.image.urlPicsumPhotos({ width: 800, height: 600 }),
+          title: faker.lorem.words({ min: 2, max: 4 }),
+        }))
+      : [];
+
+    const betCount = isParsed ? faker.number.int({ min: 1, max: 3 }) : isPartial ? faker.number.int({ min: 0, max: 1 }) : 0;
+    const chosenBets = betCount ? faker.helpers.arrayElements(bets, betCount) : [];
+    
     return {
       id: faker.string.uuid(),
       partnerId: pick(partners).id,
       createdAt: faker.date.recent({ days: 3 }),
-      type: parsed ? "parsed" : "unparsed",
-      text: faker.lorem.sentence(),
-      betId: bet?.id,
+      extraction: isParsed ? "parsed" : isPartial ? "partial" : "unparsed",
+      text: faker.lorem.sentences({ min: 1, max: 4 }),
+      betIds: chosenBets.map(b => b.id),
+      attachments,
       views: faker.number.int({ min: 20, max: 2000 }),
       tails: faker.number.int({ min: 0, max: 150 }),
     };
