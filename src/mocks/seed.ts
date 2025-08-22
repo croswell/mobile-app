@@ -721,7 +721,7 @@ export function makeSeed(): {
           })(),
           partnerId: post.partnerId,
           startTime: new Date(parsedBet.eventTime),
-          status: faker.helpers.arrayElement(["active", "active", "active", "won", "lost"]), // Mostly active
+          status: "won", // All parsed bets are completed for now
           stake: faker.number.int({ min: 10, max: 1000 })
         };
         bets.push(bet);
@@ -730,6 +730,10 @@ export function makeSeed(): {
   }
 
   // Add some additional standalone bets for variety
+  // Create exactly $25 worth of active bets
+  const activeStakes = [5, 8, 12]; // These sum to exactly $25
+  let activeBetCount = 0;
+  
   for (let i = 0; i < 15; i++) {
     const league = faker.helpers.arrayElement(["NFL", "NBA", "MLB", "NHL", "NCAAF", "NCAAB"] as const);
     const market = faker.helpers.arrayElement(["Moneyline", "Spread", "Total", "Player Prop", "Parlay"]);
@@ -775,6 +779,21 @@ export function makeSeed(): {
       "Heat vs Celtics"
     ];
     
+    // Determine status and stake
+    let status: "active" | "won" | "lost";
+    let stake: number;
+    
+    if (activeBetCount < 3) {
+      // First 3 bets are active with exact stakes that sum to $25
+      status = "active";
+      stake = activeStakes[activeBetCount];
+      activeBetCount++;
+    } else {
+      // Remaining bets are completed with random stakes
+      status = faker.helpers.arrayElement(["won", "lost"] as const);
+      stake = faker.number.int({ min: 10, max: 1000 });
+    }
+    
     const bet: BetT = {
       id: faker.string.uuid(),
       league,
@@ -785,8 +804,8 @@ export function makeSeed(): {
       bookId,
       partnerId: pick(partners).id,
       startTime: faker.date.soon({ days: faker.number.int({ min: 1, max: 7 }) }),
-      status: faker.helpers.arrayElement(["active", "active", "active", "won", "lost"]), // Mostly active
-      stake: faker.number.int({ min: 10, max: 1000 })
+      status,
+      stake
     };
     
     bets.push(bet);

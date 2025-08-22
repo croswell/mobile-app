@@ -36,7 +36,8 @@
     "twrnc": "^4.9.1",
     "zod": "^4.0.17",
     "zustand": "^5.0.8",
-    "react-native-gesture-handler": "~2.24.0"
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-svg": "15.11.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
